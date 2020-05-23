@@ -1,4 +1,8 @@
+## 0.2.0
+- Multiple files upload support 
+
 ## 0.1.0
+
 - Add example
 - Update readme
 

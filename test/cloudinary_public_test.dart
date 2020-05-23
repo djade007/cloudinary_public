@@ -14,9 +14,10 @@ void main() {
 
     // Use Mockito to return a successful response when it calls the
     // provided dio.post
-    when(client.post('https://api.cloudinary.com/v1_1/name/image/upload',
-            data: anyNamed('data')))
-        .thenAnswer(
+    when(client.post(
+      'https://api.cloudinary.com/v1_1/name/image/upload',
+      data: anyNamed('data'),
+    )).thenAnswer(
       (_) async => Response(
         data: _sampleResponse,
         statusCode: 200,
@@ -24,10 +25,11 @@ void main() {
     );
 
     final cloudinary = CloudinaryPublic('name', 'preset', dioClient: client);
-    final res = await cloudinary.uploadFile(
-      file: File('assets/icon.png'),
+    final file = CloudinaryFile.fromFile(
+      File('assets/icon.png'),
       resourceType: CloudinaryResourceType.Image,
     );
+    final res = await cloudinary.uploadFile(file);
 
     expect(res, TypeMatcher<CloudinaryResponse>());
   });

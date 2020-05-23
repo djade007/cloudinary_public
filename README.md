@@ -4,7 +4,7 @@
 
 This package allows you to upload media files directly to [cloudinary](https://cloudinary.com/documentation/upload_images#unsigned_upload), without exposing your apiKey or secretKey.
 
-## ️ Getting started
+## Getting started
 
 Add the dependency `cloudinary_public: ^0.X.X` ([find recent version](https://pub.dev/packages/cloudinary_public#-installing-tab-)) to your project and start using it:
 ```dart
