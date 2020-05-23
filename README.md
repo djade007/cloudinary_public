@@ -1,5 +1,7 @@
 # cloudinary_public
 
+[![Build Status](https://travis-ci.org/djade007/cloudinary_public.svg?branch=master)](https://travis-ci.org/djade007/cloudinary_public) [![Coverage Status](https://coveralls.io/repos/github/djade007/cloudinary_public/badge.svg?branch=master)](https://coveralls.io/github/djade007/cloudinary_public?branch=master)
+
 This package allows you to upload media files directly to [cloudinary](https://cloudinary.com/documentation/upload_images#unsigned_upload), without exposing your apiKey or secretKey.
 
 ## ️ Getting started
