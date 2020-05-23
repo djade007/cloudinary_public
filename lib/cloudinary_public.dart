@@ -53,7 +53,8 @@ class CloudinaryPublic {
     );
     final cloudinaryResponse = CloudinaryResponse.fromMap(res.data);
 
-    if (cache) { // temporary cache for this class instance
+    if (cache) {
+      // temporary cache for this class instance
       _uploadedFiles[filename] = cloudinaryResponse;
     }
     return cloudinaryResponse;
