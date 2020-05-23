@@ -21,6 +21,16 @@ class CloudinaryFile {
                 (byteData != null && file == null),
             'Only one between byteData or file must be provided');
 
+  static Future<CloudinaryFile> fromFutureByteData(
+      Future<ByteData> byteData, {
+        String identifier,
+        CloudinaryResourceType resourceType: CloudinaryResourceType.Auto,
+      }) async =>
+      CloudinaryFile(
+          byteData: await byteData,
+          identifier: identifier,
+          resourceType: resourceType);
+
   factory CloudinaryFile.fromByteData(
     ByteData byteData, {
     String identifier,

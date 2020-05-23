@@ -22,9 +22,8 @@ class CloudinaryPublic {
     dioClient ??= Dio();
   }
 
-  Future<List<CloudinaryResponse>> uploadFiles(
-      List<CloudinaryFile> files) async {
-    return await Future.wait(files.map((file) => uploadFile(file)));
+  Future<List<CloudinaryResponse>> uploadFiles(List<CloudinaryFile> files) {
+    return Future.wait(files.map((file) => uploadFile(file)));
   }
 
   Future<CloudinaryResponse> uploadFile(CloudinaryFile file) async {
@@ -53,5 +52,15 @@ class CloudinaryPublic {
       _uploadedFiles[file.identifier] = cloudinaryResponse;
     }
     return cloudinaryResponse;
+  }
+
+  Future<CloudinaryResponse> uploadFutureFile(
+      Future<CloudinaryFile> file) async {
+    return uploadFile(await file);
+  }
+
+  Future<List<CloudinaryResponse>> uploadFutureFiles(
+      List<Future<CloudinaryFile>> files) async {
+    return Future.wait(files.map((file) => uploadFutureFile(file)));
   }
 }
