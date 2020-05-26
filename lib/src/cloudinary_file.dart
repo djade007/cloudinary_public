@@ -40,10 +40,11 @@ class CloudinaryFile {
     String identifier,
     CloudinaryResourceType resourceType: CloudinaryResourceType.Auto,
   }) async =>
-      CloudinaryFile(
-          byteData: await byteData,
-          identifier: identifier,
-          resourceType: resourceType);
+      CloudinaryFile.fromByteData(
+        await byteData,
+        identifier: identifier,
+        resourceType: resourceType,
+      );
 
   /// Instantiate [CloudinaryFile] from [ByteData]
   factory CloudinaryFile.fromByteData(

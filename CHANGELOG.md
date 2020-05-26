@@ -1,4 +1,4 @@
-## 0.3.0
+## 0.3.0 - 0.3.1
 Rename uploadFutureFiles() to multiUpload()
 
 ## 0.2.1
