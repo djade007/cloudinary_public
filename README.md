@@ -26,14 +26,19 @@ print(response.secureUrl);
 
 ### Using [Multi Image Picker](https://https://pub.dev/packages/multi_image_picker) Plugin
 ```
-final data = await asset.getByteData();
+final images = await MultiImagePicker.pickImages(maxImages: 4);
 
-CloudinaryResponse cloudinaryResponse = await cloudinary.uploadFile(
-    byteData: data,
-    resourceType: CloudinaryResourceType.Image,
-    filename: asset.identifier, // optional if cache is false
+List<CloudinaryResponse> uploadedImages = await cloudinary.multiUpload(
+images
+    .map(
+      (image) => CloudinaryFile.fromFutureByteData(
+        image.getByteData(),
+        identifier: image.identifier,
+      ),
+    )
+    .toList(),
 );
 
-print(response.secureUrl);
+print(uploadedImages[0].secureUrl);
 ```
 

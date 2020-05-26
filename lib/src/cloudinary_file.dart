@@ -5,12 +5,25 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
+/// The recognised file class to be used for this package
 class CloudinaryFile {
+  /// The [ByteData] file to be uploaded
   final ByteData byteData;
+
+  /// The [File] to be uploaded
   final File file;
+
+  /// The file name/path
   final String identifier;
+
+  /// The cloudinary resource type to be uploaded
+  /// see [CloudinaryResourceType.Auto] - default,
+  /// [CloudinaryResourceType.Image],
+  /// [CloudinaryResourceType.Video],
+  /// [CloudinaryResourceType.Raw],
   final CloudinaryResourceType resourceType;
 
+  /// [CloudinaryFile] instance
   const CloudinaryFile({
     this.byteData,
     this.file,
@@ -21,16 +34,18 @@ class CloudinaryFile {
                 (byteData != null && file == null),
             'Only one between byteData or file must be provided');
 
+  /// Instantiate [CloudinaryFile] from future [ByteData]
   static Future<CloudinaryFile> fromFutureByteData(
-      Future<ByteData> byteData, {
-        String identifier,
-        CloudinaryResourceType resourceType: CloudinaryResourceType.Auto,
-      }) async =>
+    Future<ByteData> byteData, {
+    String identifier,
+    CloudinaryResourceType resourceType: CloudinaryResourceType.Auto,
+  }) async =>
       CloudinaryFile(
           byteData: await byteData,
           identifier: identifier,
           resourceType: resourceType);
 
+  /// Instantiate [CloudinaryFile] from [ByteData]
   factory CloudinaryFile.fromByteData(
     ByteData byteData, {
     String identifier,
@@ -41,6 +56,7 @@ class CloudinaryFile {
           identifier: identifier,
           resourceType: resourceType);
 
+  /// Instantiate [CloudinaryFile] from [File]
   factory CloudinaryFile.fromFile(
     File file, {
     String identifier,
@@ -52,13 +68,14 @@ class CloudinaryFile {
         resourceType: resourceType,
       );
 
-  Future<MultipartFile> toMultipartFile() async {
+  /// Convert [CloudinaryFile] to [MultipartFile]
+  MultipartFile toMultipartFile() {
     if (byteData != null) {
       return MultipartFile.fromBytes(
         byteData.buffer.asUint8List(),
         filename: identifier,
       );
     }
-    return MultipartFile.fromFile(file.path, filename: identifier);
+    return MultipartFile.fromFileSync(file.path, filename: identifier);
   }
 }

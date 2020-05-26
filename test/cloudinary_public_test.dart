@@ -2,36 +2,110 @@ import 'dart:io';
 
 import 'package:cloudinary_public/cloudinary_public.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:matcher/matcher.dart';
 import 'package:mockito/mockito.dart';
 
 class MockClient extends Mock implements Dio {}
 
-void main() {
-  test('uploads an image file', () async {
-    final client = MockClient();
+File getFile() {
+  File file = File('../test/icon.png');
+  try {
+    file.lengthSync();
+  } catch (exception) {
+    file = File('test/icon.png');
+  }
+  return file;
+}
 
-    // Use Mockito to return a successful response when it calls the
-    // provided dio.post
-    when(client.post(
-      'https://api.cloudinary.com/v1_1/name/image/upload',
-      data: anyNamed('data'),
-    )).thenAnswer(
-      (_) async => Response(
-        data: _sampleResponse,
-        statusCode: 200,
-      ),
+void main() {
+  final client = MockClient();
+
+  // Use Mockito to return a successful response when it calls the
+  // provided dio.post
+  when(client.post(
+    'https://api.cloudinary.com/v1_1/name/image/upload',
+    data: anyNamed('data'),
+  )).thenAnswer(
+    (_) async => Response(
+      data: _sampleResponse,
+      statusCode: 200,
+    ),
+  );
+
+  final tempFile = getFile();
+
+  test('uploads an image file', () async {
+    final cloudinary = CloudinaryPublic(
+      'name',
+      'preset',
+      dioClient: client,
+      cache: true,
     );
 
-    final cloudinary = CloudinaryPublic('name', 'preset', dioClient: client);
     final file = CloudinaryFile.fromFile(
-      File('assets/icon.png'),
+      tempFile,
       resourceType: CloudinaryResourceType.Image,
     );
     final res = await cloudinary.uploadFile(file);
-
     expect(res, TypeMatcher<CloudinaryResponse>());
+
+    // test toString
+    expect(res.toString(), res.toMap().toString());
+
+    // test cache
+    final secondUpload = await cloudinary.uploadFile(file);
+    expect(secondUpload, TypeMatcher<CloudinaryResponse>());
+    expect(secondUpload.fromCache, true);
+  });
+
+  test('upload multiple image files', () async {
+    final cloudinary = CloudinaryPublic(
+      'name',
+      'preset',
+      dioClient: client,
+      cache: true,
+    );
+
+    final files = <CloudinaryFile>[];
+    final file = CloudinaryFile.fromFile(
+      tempFile,
+      resourceType: CloudinaryResourceType.Image,
+    );
+    files.add(file);
+    files.add(file);
+    final uploadedFiles = await cloudinary.uploadFiles(files);
+
+    expect(uploadedFiles.length, 2);
+
+    expect(uploadedFiles[0], TypeMatcher<CloudinaryResponse>());
+
+    expect(uploadedFiles[1], TypeMatcher<CloudinaryResponse>());
+  });
+
+  test('upload multiple image byteData', () async {
+    final cloudinary = CloudinaryPublic(
+      'name',
+      'preset',
+      dioClient: client,
+      cache: true,
+    );
+
+    final files = <Future<CloudinaryFile>>[];
+    final file = CloudinaryFile.fromFutureByteData(Future.value(ByteData(8)),
+        resourceType: CloudinaryResourceType.Image, identifier: 'image.jpg');
+
+    files.add(file);
+    files.add(file);
+
+    final uploadedFiles = await cloudinary.multiUpload(files);
+
+    expect(uploadedFiles.length, 2);
+
+    expect(uploadedFiles[0], TypeMatcher<CloudinaryResponse>());
+
+    expect(uploadedFiles[1], TypeMatcher<CloudinaryResponse>());
   });
 }
 

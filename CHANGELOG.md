@@ -1,3 +1,9 @@
+## 0.3.0
+Rename uploadFutureFiles() to multiUpload()
+
+## 0.2.1
+- Support for future byte data 
+
 ## 0.2.0
 - Multiple files upload support 
 

@@ -18,15 +18,25 @@ main() async {
   print(response.secureUrl);
 
   // Using Byte Data. For example gotten from: https://pub.dev/packages/multi_image_picker
-  // final byteData = await asset.getByteData();
-  final byteData = ByteData(10);
-  CloudinaryResponse cloudinaryResponse = await cloudinary.uploadFile(
-    CloudinaryFile.fromByteData(
-      byteData,
-      resourceType: CloudinaryResourceType.Image,
-      identifier: '_ASSET_IDENTIFIER_', // optional if cache is false
-    ),
+  //  final images = await MultiImagePicker.pickImages(maxImages: 4);
+  final images = List.generate(4, (_) => Asset());
+
+  List<CloudinaryResponse> uploadedImages = await cloudinary.multiUpload(
+    images
+        .map(
+          (image) => CloudinaryFile.fromFutureByteData(
+            image.getByteData(),
+            identifier: image.identifier,
+          ),
+        )
+        .toList(),
   );
 
-  print(cloudinaryResponse.secureUrl);
+  print(uploadedImages[0].secureUrl);
+}
+
+class Asset {
+  String identifier = 'image.jpg';
+
+  Future<ByteData> getByteData() async => ByteData(10);
 }
