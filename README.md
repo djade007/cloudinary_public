@@ -9,6 +9,8 @@ This package allows you to upload media files directly to [cloudinary](https://c
 Add the dependency `cloudinary_public: ^0.X.X` ([find recent version](https://pub.dev/packages/cloudinary_public#-installing-tab-)) to your project and start using it:
 ```dart
 import 'package:cloudinary_public/cloudinary_public.dart';
+
+final cloudinary = CloudinaryPublic('CLOUD_NAME', 'UPLOAD_PRESET', cache: false);
 ```
 
 ### Using [Image Picker](https://pub.dev/packages/image_picker) Plugin
@@ -16,9 +18,7 @@ import 'package:cloudinary_public/cloudinary_public.dart';
 var image = await ImagePicker.pickImage(source: ImageSource.camera);
 
 CloudinaryResponse response = await cloudinary.uploadFile(
-    file: image,
-    resourceType: CloudinaryResourceType.Image,
-    filename: image.path, // optional if cache is false
+    CloudinaryFile.fromFile(image, resourceType: CloudinaryResourceType.Image),
 );
 
 print(response.secureUrl);
