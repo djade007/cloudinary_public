@@ -4,6 +4,8 @@ import 'package:flutter/foundation.dart';
 
 import './cloudinary_response.dart';
 
+// todo: Transformations
+
 /// The base class for this package
 class CloudinaryPublic {
   /// Cloudinary api base url
@@ -49,7 +51,7 @@ class CloudinaryPublic {
     }
 
     FormData formData = FormData.fromMap({
-      'file': file.toMultipartFile(),
+      'file': file.toMultipartFile() ?? file.url,
       'upload_preset': _uploadPreset,
     });
 

@@ -1,5 +1,5 @@
-## 0.3.2
-Update readme
+## 0.3.3
+Add upload from external url feature
 
 ## 0.3.0 - 0.3.1
 Rename uploadFutureFiles() to multiUpload()

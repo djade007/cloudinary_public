@@ -19,13 +19,16 @@ File getFile() {
   return file;
 }
 
+const cloudName = 'name';
+const uploadPreset = 'preset';
+
 void main() {
   final client = MockClient();
 
   // Use Mockito to return a successful response when it calls the
   // provided dio.post
   when(client.post(
-    'https://api.cloudinary.com/v1_1/name/image/upload',
+    'https://api.cloudinary.com/v1_1/$cloudName/image/upload',
     data: anyNamed('data'),
   )).thenAnswer(
     (_) async => Response(
@@ -34,12 +37,37 @@ void main() {
     ),
   );
 
+  test('uploads an image from external url', () async {
+    final cloudinary = CloudinaryPublic(
+      cloudName,
+      uploadPreset,
+      dioClient: client,
+      cache: true,
+    );
+
+    final file = CloudinaryFile.fromUrl(
+      'https://via.placeholder.com/400',
+      resourceType: CloudinaryResourceType.Image,
+    );
+
+    final res = await cloudinary.uploadFile(file);
+    expect(res, TypeMatcher<CloudinaryResponse>());
+
+    // test toString
+    expect(res.toString(), res.toMap().toString());
+
+    // test cache
+    final secondUpload = await cloudinary.uploadFile(file);
+    expect(secondUpload, TypeMatcher<CloudinaryResponse>());
+    expect(secondUpload.fromCache, true);
+  });
+
   final tempFile = getFile();
 
   test('uploads an image file', () async {
     final cloudinary = CloudinaryPublic(
-      'name',
-      'preset',
+      cloudName,
+      uploadPreset,
       dioClient: client,
       cache: true,
     );
@@ -62,8 +90,8 @@ void main() {
 
   test('upload multiple image files', () async {
     final cloudinary = CloudinaryPublic(
-      'name',
-      'preset',
+      cloudName,
+      uploadPreset,
       dioClient: client,
       cache: true,
     );
@@ -86,8 +114,8 @@ void main() {
 
   test('upload multiple image byteData', () async {
     final cloudinary = CloudinaryPublic(
-      'name',
-      'preset',
+      cloudName,
+      uploadPreset,
       dioClient: client,
       cache: true,
     );
@@ -126,8 +154,8 @@ const _sampleResponse = {
   'etag': '787996e313bcdd299d090b20389tta8d',
   'placeholder': 'false',
   'url':
-      'http://res.cloudinary.com/name/image/upload/v1590212116/psryios0nkgpf1h4um3h.jpg',
+      'http://res.cloudinary.com/$cloudName/image/upload/v1590212116/psryios0nkgpf1h4um3h.jpg',
   'secure_url':
-      'https://res.cloudinary.com/name/image/upload/v1590212116/psryios0nkgpf1h4um3h.jpg',
+      'https://res.cloudinary.com/$cloudName/image/upload/v1590212116/psryios0nkgpf1h4um3h.jpg',
   'original_filename': '001'
 };

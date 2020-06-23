@@ -16,6 +16,9 @@ class CloudinaryFile {
   /// The file name/path
   final String identifier;
 
+  /// External url
+  final String url;
+
   /// The cloudinary resource type to be uploaded
   /// see [CloudinaryResourceType.Auto] - default,
   /// [CloudinaryResourceType.Image],
@@ -28,10 +31,12 @@ class CloudinaryFile {
     this.byteData,
     this.file,
     this.identifier,
+    this.url,
     @required this.resourceType,
   }) : assert(
             (byteData == null && file != null) ||
-                (byteData != null && file == null),
+                (byteData != null && file == null) ||
+                url != null,
             'Only one between byteData or file must be provided');
 
   /// Instantiate [CloudinaryFile] from future [ByteData]
@@ -65,12 +70,25 @@ class CloudinaryFile {
   }) =>
       CloudinaryFile(
         file: file,
-        identifier: identifier ??= file.path,
+        identifier: identifier ??= file.path.split('/').last,
+        resourceType: resourceType,
+      );
+
+  /// Instantiate [CloudinaryFile] from an external url
+  factory CloudinaryFile.fromUrl(
+    String url, {
+    CloudinaryResourceType resourceType: CloudinaryResourceType.Auto,
+  }) =>
+      CloudinaryFile(
+        url: url,
+        identifier: url,
         resourceType: resourceType,
       );
 
   /// Convert [CloudinaryFile] to [MultipartFile]
   MultipartFile toMultipartFile() {
+    if (url != null) return null;
+
     if (byteData != null) {
       return MultipartFile.fromBytes(
         byteData.buffer.asUint8List(),
