@@ -1,3 +1,6 @@
+## 0.4.0
+Image transformation feature
+
 ## 0.3.3
 Add upload from external url feature
 
