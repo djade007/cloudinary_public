@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 
 import './cloudinary_response.dart';
+import '../cloudinary_public.dart';
 
 // todo: Transformations
 
@@ -34,6 +35,10 @@ class CloudinaryPublic {
   }) {
     /// set default dio client
     dioClient ??= Dio();
+  }
+
+  CloudinaryImage getImage(String publicId) {
+    return CloudinaryImage.fromPublicId(_cloudName, publicId);
   }
 
   /// Upload multiple files together

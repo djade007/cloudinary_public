@@ -42,3 +42,40 @@ images
 print(uploadedImages[0].secureUrl);
 ```
 
+## Image Transformation
+
+```dart
+// CloudinaryImage
+final cloudinaryImage = CloudinaryImage('https://res.cloudinary.com/demo/image/upload/front_face.png');
+// or using the image public id
+final cloudinaryImage = cloudinary.getImage('front_face');
+
+final String url = cloudinaryImage.transform().width(150).height(150).gravity('face').crop('thumb').generate();
+// or using the shortcut
+final String url = cloudinaryImage.thumbnail(width: 150, height: 150).generate();
+
+
+// Chain example
+final url = cloudinaryImage.transform()
+            .width(150)
+            .height(150)
+            .gravity('face')
+            .crop('thumb')
+            .chain()
+            .radius(20)
+            .chain()
+            .effect('sepia')
+            .chain()
+            .overlay(cloudinary.getImage('cloudinary_icon'))
+            .gravity('south_east')
+            .x(5)
+            .y(5)
+            .width(50)
+            .opacity(60)
+            .effect('brightness:200')
+            .chain()
+            .angle(10)
+            .generate();
+// generates
+// https://res.cloudinary.com/demo/image/upload/c_thumb,g_face,h_150,w_150/r_20/e_sepia/e_brightness:200,g_south_east,l_cloudinary_icon,o_60,w_50,x_5,y_5/a_10/front_face.png
+```

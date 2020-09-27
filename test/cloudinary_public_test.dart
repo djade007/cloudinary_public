@@ -19,7 +19,7 @@ File getFile() {
   return file;
 }
 
-const cloudName = 'name';
+const cloudName = 'demo';
 const uploadPreset = 'preset';
 
 void main() {
@@ -134,6 +134,62 @@ void main() {
     expect(uploadedFiles[0], TypeMatcher<CloudinaryResponse>());
 
     expect(uploadedFiles[1], TypeMatcher<CloudinaryResponse>());
+  });
+
+  test('Test transformation', () {
+    final cloudinary = CloudinaryPublic(
+      cloudName,
+      uploadPreset,
+      dioClient: client,
+      cache: true,
+    );
+
+    final image = CloudinaryImage(
+      'https://res.cloudinary.com/demo/image/upload/front_face.png',
+    );
+
+    final url = image
+        .transform()
+        .width(150)
+        .height(150)
+        .gravity('face')
+        .crop('thumb')
+        .chain()
+        .radius(20)
+        .chain()
+        .effect('sepia')
+        .chain()
+        .overlay(cloudinary.getImage('cloudinary_icon'))
+        .gravity('south_east')
+        .x(5)
+        .y(5)
+        .width(50)
+        .opacity(60)
+        .effect('brightness:200')
+        .chain()
+        .angle(10)
+        .generate();
+
+    expect(
+        'https://res.cloudinary.com/demo/image/upload/c_thumb,g_face,h_150,'
+        'w_150/r_20/e_sepia/e_brightness:200,g_south_east,l_cloudinary_icon,'
+        'o_60,w_50,x_5,y_5/a_10/front_face.png',
+        url);
+  });
+
+  test('thumbnail shortcut', () {
+    final cloudinary = CloudinaryPublic(
+      cloudName,
+      uploadPreset,
+      dioClient: client,
+      cache: true,
+    );
+
+    final image = cloudinary.getImage('cloudinary_icon');
+    expect(
+        image.thumbnail().toString(),
+        'https://res.cloudinary.com/demo/image/upload/c_thumb,g_face,'
+        'h_200,w_200/cloudinary_icon');
   });
 }
 
