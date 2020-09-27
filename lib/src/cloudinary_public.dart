@@ -5,8 +5,6 @@ import 'package:flutter/foundation.dart';
 import './cloudinary_response.dart';
 import '../cloudinary_public.dart';
 
-// todo: Transformations
-
 /// The base class for this package
 class CloudinaryPublic {
   /// Cloudinary api base url
