@@ -59,9 +59,8 @@ class CloudinaryPublic {
     });
 
     if (file.tags != null && file.tags.isNotEmpty) {
-      formData.fields.add(MapEntry<String, String>(
-        'tags', file.tags.join(',')
-      ));
+      formData.fields
+          .add(MapEntry<String, String>('tags', file.tags.join(',')));
     }
 
     /// throws DioError

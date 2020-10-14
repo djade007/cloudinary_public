@@ -1,5 +1,5 @@
-## 0.6.1
-- Update Readme
+## 0.6.1+1
+- Format files
 
 ## 0.6.0
 - Remove File dependency and replace the path String
