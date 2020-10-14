@@ -6,6 +6,7 @@ class CloudinaryResponse {
   final String url;
   final String secureUrl;
   final String originalFilename;
+  final List<String> tags;
   final bool fromCache;
 
   CloudinaryResponse({
@@ -15,6 +16,7 @@ class CloudinaryResponse {
     this.url,
     this.secureUrl,
     this.originalFilename,
+    this.tags,
     this.fromCache: false,
   });
 
@@ -27,6 +29,7 @@ class CloudinaryResponse {
       url: data['url'],
       secureUrl: data['secure_url'],
       originalFilename: data['original_filename'],
+      tags: data['tags'] != null ? (data['tags'] as List).map((tag) => tag as String).toList() : []
     );
   }
 
@@ -39,6 +42,7 @@ class CloudinaryResponse {
       url: url,
       secureUrl: secureUrl,
       originalFilename: originalFilename,
+      tags: tags,
       fromCache: true,
     );
   }
@@ -51,7 +55,8 @@ class CloudinaryResponse {
       'created_at': createdAt.toString(),
       'url': url,
       'secure_url': secureUrl,
-      'original_filename': originalFilename
+      'original_filename': originalFilename,
+      'tags' : tags
     };
   }
 

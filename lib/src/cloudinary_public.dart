@@ -58,6 +58,12 @@ class CloudinaryPublic {
       'upload_preset': _uploadPreset,
     });
 
+    if (file.tags != null && file.tags.isNotEmpty) {
+      formData.fields.add(MapEntry<String, String>(
+        'tags', file.tags.join(',')
+      ));
+    }
+
     /// throws DioError
     final res = await dioClient.post(
       '$_baseUrl/$_cloudName/${describeEnum(file.resourceType).toLowerCase()}/upload',
