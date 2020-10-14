@@ -12,7 +12,8 @@ main() async {
   // Using a file. For example, gotten from: https://pub.dev/packages/image_picker
   File file = File('');
   CloudinaryResponse response = await cloudinary.uploadFile(
-    CloudinaryFile.fromFile(file, resourceType: CloudinaryResourceType.Image),
+    CloudinaryFile.fromFile(file.path,
+        resourceType: CloudinaryResourceType.Image),
   );
 
   print(response.secureUrl);

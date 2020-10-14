@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:cloudinary_public/cloudinary_public.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
@@ -10,8 +8,8 @@ class CloudinaryFile {
   /// The [ByteData] file to be uploaded
   final ByteData byteData;
 
-  /// The [File] to be uploaded
-  final File file;
+  /// The path of the [File] to be uploaded
+  final String filePath;
 
   /// The file name/path
   final String identifier;
@@ -30,66 +28,59 @@ class CloudinaryFile {
   final List<String> tags;
 
   /// [CloudinaryFile] instance
-  const CloudinaryFile({
-    this.byteData,
-    this.file,
-    this.identifier,
-    this.url,
-    @required this.resourceType,
-    this.tags
-  }) : assert(
-            (byteData == null && file != null) ||
-                (byteData != null && file == null) ||
+  const CloudinaryFile(
+      {this.byteData,
+      this.filePath,
+      this.identifier,
+      this.url,
+      @required this.resourceType,
+      this.tags})
+      : assert(
+            (byteData == null && filePath != null) ||
+                (byteData != null && filePath == null) ||
                 url != null,
             'Only one between byteData or file must be provided');
 
   /// Instantiate [CloudinaryFile] from future [ByteData]
-  static Future<CloudinaryFile> fromFutureByteData(
-    Future<ByteData> byteData, {
-    String identifier,
-    CloudinaryResourceType resourceType: CloudinaryResourceType.Auto,
-    List<String> tags
-  }) async =>
+  static Future<CloudinaryFile> fromFutureByteData(Future<ByteData> byteData,
+          {String identifier,
+          CloudinaryResourceType resourceType: CloudinaryResourceType.Auto,
+          List<String> tags}) async =>
       CloudinaryFile.fromByteData(
         await byteData,
         identifier: identifier,
         resourceType: resourceType,
-        tags: tags
+        tags: tags,
       );
 
   /// Instantiate [CloudinaryFile] from [ByteData]
-  factory CloudinaryFile.fromByteData(
-    ByteData byteData, {
-    String identifier,
-    CloudinaryResourceType resourceType: CloudinaryResourceType.Auto,
-    List<String> tags
-  }) =>
+  factory CloudinaryFile.fromByteData(ByteData byteData,
+          {String identifier,
+          CloudinaryResourceType resourceType: CloudinaryResourceType.Auto,
+          List<String> tags}) =>
       CloudinaryFile(
-          byteData: byteData,
-          identifier: identifier,
-          resourceType: resourceType,
-          tags: tags);
-
-  /// Instantiate [CloudinaryFile] from [File]
-  factory CloudinaryFile.fromFile(
-    File file, {
-    String identifier,
-    CloudinaryResourceType resourceType: CloudinaryResourceType.Auto,
-    List<String> tags
-  }) =>
-      CloudinaryFile(
-        file: file,
-        identifier: identifier ??= file.path.split('/').last,
+        byteData: byteData,
+        identifier: identifier,
         resourceType: resourceType,
-        tags: tags
+        tags: tags,
+      );
+
+  /// Instantiate [CloudinaryFile] from [File] path
+  factory CloudinaryFile.fromFile(String path,
+          {String identifier,
+          CloudinaryResourceType resourceType: CloudinaryResourceType.Auto,
+          List<String> tags}) =>
+      CloudinaryFile(
+        filePath: path,
+        identifier: identifier ??= path.split('/').last,
+        resourceType: resourceType,
+        tags: tags,
       );
 
   /// Instantiate [CloudinaryFile] from an external url
-  factory CloudinaryFile.fromUrl(
-    String url, {
-    CloudinaryResourceType resourceType: CloudinaryResourceType.Auto,
-    List<String> tags
-  }) =>
+  factory CloudinaryFile.fromUrl(String url,
+          {CloudinaryResourceType resourceType: CloudinaryResourceType.Auto,
+          List<String> tags}) =>
       CloudinaryFile(
         url: url,
         identifier: url,
@@ -106,6 +97,9 @@ class CloudinaryFile {
         filename: identifier,
       );
     }
-    return MultipartFile.fromFileSync(file.path, filename: identifier);
+    return MultipartFile.fromFileSync(
+      filePath,
+      filename: identifier,
+    );
   }
 }

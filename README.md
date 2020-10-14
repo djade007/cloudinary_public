@@ -18,7 +18,7 @@ final cloudinary = CloudinaryPublic('CLOUD_NAME', 'UPLOAD_PRESET', cache: false)
 var image = await ImagePicker.pickImage(source: ImageSource.camera);
 
 CloudinaryResponse response = await cloudinary.uploadFile(
-    CloudinaryFile.fromFile(image, resourceType: CloudinaryResourceType.Image),
+    CloudinaryFile.fromFile(image.path, resourceType: CloudinaryResourceType.Image),
 );
 
 print(response.secureUrl);
