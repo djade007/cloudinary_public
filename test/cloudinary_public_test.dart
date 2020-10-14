@@ -75,6 +75,7 @@ void main() {
     final file = CloudinaryFile.fromFile(
       tempFile,
       resourceType: CloudinaryResourceType.Image,
+      tags: ['trip']
     );
     final res = await cloudinary.uploadFile(file);
     expect(res, TypeMatcher<CloudinaryResponse>());
