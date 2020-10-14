@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cloudinary_public/cloudinary_public.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/services.dart';
@@ -7,15 +9,14 @@ import 'package:mockito/mockito.dart';
 
 class MockClient extends Mock implements Dio {}
 
-String getFilePath() {
-  return 'test/icon.png';
-/*  File file = File('../test/icon.png');
+File getFile() {
+  File file = File('../test/icon.png');
   try {
     file.lengthSync();
   } catch (exception) {
     file = File('test/icon.png');
   }
-  return file;*/
+  return file;
 }
 
 const cloudName = 'demo';
@@ -61,7 +62,7 @@ void main() {
     expect(secondUpload.fromCache, true);
   });
 
-  final path = getFilePath();
+  final tempFile = getFile();
 
   test('uploads an image file', () async {
     final cloudinary = CloudinaryPublic(
@@ -71,7 +72,7 @@ void main() {
       cache: true,
     );
 
-    final file = CloudinaryFile.fromFile(path,
+    final file = CloudinaryFile.fromFile(tempFile.path,
         resourceType: CloudinaryResourceType.Image, tags: ['trip']);
     final res = await cloudinary.uploadFile(file);
     expect(res, TypeMatcher<CloudinaryResponse>());
@@ -95,7 +96,7 @@ void main() {
 
     final files = <CloudinaryFile>[];
     final file = CloudinaryFile.fromFile(
-      path,
+      tempFile.path,
       resourceType: CloudinaryResourceType.Image,
     );
     files.add(file);
@@ -210,5 +211,5 @@ const _sampleResponse = {
       'http://res.cloudinary.com/$cloudName/image/upload/v1590212116/psryios0nkgpf1h4um3h.jpg',
   'secure_url':
       'https://res.cloudinary.com/$cloudName/image/upload/v1590212116/psryios0nkgpf1h4um3h.jpg',
-  'original_filename': '001',
+  'original_filename': '001'
 };
