@@ -29,7 +29,7 @@ class CloudinaryResponse {
       url: data['url'],
       secureUrl: data['secure_url'],
       originalFilename: data['original_filename'],
-      tags: (data['tags'] as List).map((tag) => tag as String).toList()
+      tags: data['tags'] != null ? (data['tags'] as List).map((tag) => tag as String).toList() : []
     );
   }
 
