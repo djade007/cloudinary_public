@@ -26,6 +26,9 @@ class CloudinaryFile {
   /// [CloudinaryResourceType.Raw],
   final CloudinaryResourceType resourceType;
 
+  /// File tags
+  final List<String> tags;
+
   /// [CloudinaryFile] instance
   const CloudinaryFile({
     this.byteData,
@@ -33,6 +36,7 @@ class CloudinaryFile {
     this.identifier,
     this.url,
     @required this.resourceType,
+    this.tags
   }) : assert(
             (byteData == null && file != null) ||
                 (byteData != null && file == null) ||
@@ -44,11 +48,13 @@ class CloudinaryFile {
     Future<ByteData> byteData, {
     String identifier,
     CloudinaryResourceType resourceType: CloudinaryResourceType.Auto,
+    List<String> tags
   }) async =>
       CloudinaryFile.fromByteData(
         await byteData,
         identifier: identifier,
         resourceType: resourceType,
+        tags: tags
       );
 
   /// Instantiate [CloudinaryFile] from [ByteData]
@@ -56,28 +62,33 @@ class CloudinaryFile {
     ByteData byteData, {
     String identifier,
     CloudinaryResourceType resourceType: CloudinaryResourceType.Auto,
+    List<String> tags
   }) =>
       CloudinaryFile(
           byteData: byteData,
           identifier: identifier,
-          resourceType: resourceType);
+          resourceType: resourceType,
+          tags: tags);
 
   /// Instantiate [CloudinaryFile] from [File]
   factory CloudinaryFile.fromFile(
     File file, {
     String identifier,
     CloudinaryResourceType resourceType: CloudinaryResourceType.Auto,
+    List<String> tags
   }) =>
       CloudinaryFile(
         file: file,
         identifier: identifier ??= file.path.split('/').last,
         resourceType: resourceType,
+        tags: tags
       );
 
   /// Instantiate [CloudinaryFile] from an external url
   factory CloudinaryFile.fromUrl(
     String url, {
     CloudinaryResourceType resourceType: CloudinaryResourceType.Auto,
+    List<String> tags
   }) =>
       CloudinaryFile(
         url: url,
