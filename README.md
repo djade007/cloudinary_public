@@ -6,7 +6,7 @@ This package allows you to upload media files directly to [cloudinary](https://c
 
 ## Getting started
 
-Add the dependency `cloudinary_public: ^0.X.X` ([find recent version](https://pub.dev/packages/cloudinary_public#-installing-tab-)) to your project and start using it:
+Add the dependency `cloudinary_public: ^0.6.0` ([find recent version](https://pub.dev/packages/cloudinary_public#-installing-tab-)) to your project and start using it:
 ```dart
 import 'package:cloudinary_public/cloudinary_public.dart';
 

@@ -1,3 +1,7 @@
+## 0.6.0
+- Remove File dependency and replace the path String
+- Added Tags
+
 ## 0.4.0
 Image transformation feature
 
