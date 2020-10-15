@@ -1,8 +1,11 @@
-## 0.6.1+1
+## 0.6.2
+- Added option to override default upload_preset 
+
+## 0.6.1
 - Format files
 
 ## 0.6.0
-- Remove File dependency and replace the path String
+- Remove File dependency and replace with path String
 - Added Tags
 
 ## 0.4.0
