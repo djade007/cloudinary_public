@@ -40,12 +40,13 @@ class CloudinaryPublic {
   }
 
   /// Upload multiple files together
-  Future<List<CloudinaryResponse>> uploadFiles(List<CloudinaryFile> files) {
-    return Future.wait(files.map((file) => uploadFile(file)));
+  Future<List<CloudinaryResponse>> uploadFiles(List<CloudinaryFile> files, {String uploadPreset}) {
+    return Future.wait(files.map((file) => uploadFile(file, uploadPreset: uploadPreset)));
   }
 
   /// Upload the cloudinary file to using the public api
-  Future<CloudinaryResponse> uploadFile(CloudinaryFile file) async {
+  /// Override the default upload preset (when [CloudinaryPublic] is instantiated) with this one (if specified).
+  Future<CloudinaryResponse> uploadFile(CloudinaryFile file, {String uploadPreset}) async {
     if (cache) {
       assert(file.identifier != null, 'identifier is required for caching');
 
@@ -55,7 +56,7 @@ class CloudinaryPublic {
 
     FormData formData = FormData.fromMap({
       'file': file.toMultipartFile() ?? file.url,
-      'upload_preset': _uploadPreset,
+      'upload_preset': uploadPreset ?? _uploadPreset,
     });
 
     if (file.tags != null && file.tags.isNotEmpty) {
@@ -80,13 +81,13 @@ class CloudinaryPublic {
 
   /// Upload the file using [uploadFile]
   Future<CloudinaryResponse> uploadFutureFile(
-      Future<CloudinaryFile> file) async {
-    return uploadFile(await file);
+      Future<CloudinaryFile> file, {String uploadPreset}) async {
+    return uploadFile(await file, uploadPreset: uploadPreset);
   }
 
   /// Upload multiple files using simultaneously [uploadFutureFile]
   Future<List<CloudinaryResponse>> multiUpload(
-      List<Future<CloudinaryFile>> files) async {
-    return Future.wait(files.map((file) => uploadFutureFile(file)));
+      List<Future<CloudinaryFile>> files, {String uploadPreset}) async {
+    return Future.wait(files.map((file) => uploadFutureFile(file, uploadPreset: uploadPreset)));
   }
 }

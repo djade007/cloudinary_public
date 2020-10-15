@@ -86,6 +86,28 @@ void main() {
     expect(secondUpload.fromCache, true);
   });
 
+  test('uploads an image file overriding the upload_preset', () async {
+    final cloudinary = CloudinaryPublic(
+      cloudName,
+      uploadPreset,
+      dioClient: client,
+      cache: true,
+    );
+
+    final file = CloudinaryFile.fromFile(tempFile.path,
+        resourceType: CloudinaryResourceType.Image, tags: ['trip']);
+    final res = await cloudinary.uploadFile(file);
+    expect(res, TypeMatcher<CloudinaryResponse>());
+
+    // test toString
+    expect(res.toString(), res.toMap().toString());
+
+    // test cache
+    final secondUpload = await cloudinary.uploadFile(file, uploadPreset: 'another_preset');
+    expect(secondUpload, TypeMatcher<CloudinaryResponse>());
+    expect(secondUpload.fromCache, true);
+  });
+
   test('upload multiple image files', () async {
     final cloudinary = CloudinaryPublic(
       cloudName,
