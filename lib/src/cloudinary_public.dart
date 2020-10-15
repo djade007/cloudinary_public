@@ -40,13 +40,23 @@ class CloudinaryPublic {
   }
 
   /// Upload multiple files together
-  Future<List<CloudinaryResponse>> uploadFiles(List<CloudinaryFile> files, {String uploadPreset}) {
-    return Future.wait(files.map((file) => uploadFile(file, uploadPreset: uploadPreset)));
+  Future<List<CloudinaryResponse>> uploadFiles(
+    List<CloudinaryFile> files, {
+    String uploadPreset,
+  }) {
+    return Future.wait(
+      files.map(
+        (file) => uploadFile(file, uploadPreset: uploadPreset),
+      ),
+    );
   }
 
   /// Upload the cloudinary file to using the public api
   /// Override the default upload preset (when [CloudinaryPublic] is instantiated) with this one (if specified).
-  Future<CloudinaryResponse> uploadFile(CloudinaryFile file, {String uploadPreset}) async {
+  Future<CloudinaryResponse> uploadFile(
+    CloudinaryFile file, {
+    String uploadPreset,
+  }) async {
     if (cache) {
       assert(file.identifier != null, 'identifier is required for caching');
 
@@ -66,7 +76,9 @@ class CloudinaryPublic {
 
     /// throws DioError
     final res = await dioClient.post(
-      '$_baseUrl/$_cloudName/${describeEnum(file.resourceType).toLowerCase()}/upload',
+      '$_baseUrl/$_cloudName/'
+      '${describeEnum(file.resourceType).toLowerCase()}'
+      '/upload',
       data: formData,
     );
 
@@ -81,13 +93,21 @@ class CloudinaryPublic {
 
   /// Upload the file using [uploadFile]
   Future<CloudinaryResponse> uploadFutureFile(
-      Future<CloudinaryFile> file, {String uploadPreset}) async {
+    Future<CloudinaryFile> file, {
+    String uploadPreset,
+  }) async {
     return uploadFile(await file, uploadPreset: uploadPreset);
   }
 
   /// Upload multiple files using simultaneously [uploadFutureFile]
   Future<List<CloudinaryResponse>> multiUpload(
-      List<Future<CloudinaryFile>> files, {String uploadPreset}) async {
-    return Future.wait(files.map((file) => uploadFutureFile(file, uploadPreset: uploadPreset)));
+    List<Future<CloudinaryFile>> files, {
+    String uploadPreset,
+  }) async {
+    return Future.wait(
+      files.map(
+        (file) => uploadFutureFile(file, uploadPreset: uploadPreset),
+      ),
+    );
   }
 }

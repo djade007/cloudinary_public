@@ -103,7 +103,10 @@ void main() {
     expect(res.toString(), res.toMap().toString());
 
     // test cache
-    final secondUpload = await cloudinary.uploadFile(file, uploadPreset: 'another_preset');
+    final secondUpload = await cloudinary.uploadFile(
+      file,
+      uploadPreset: 'another_preset',
+    );
     expect(secondUpload, TypeMatcher<CloudinaryResponse>());
     expect(secondUpload.fromCache, true);
   });
