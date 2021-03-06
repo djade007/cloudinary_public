@@ -71,9 +71,9 @@ class _ImagePickerExampleState extends State<ImagePickerExample> {
         ),
       );
       print(res);
-    } catch (e, s) {
-      print(e);
-      print(s);
+    } on CloudinaryException catch (e) {
+      print(e.message);
+      print(e.request);
     }
 
     setState(() {
