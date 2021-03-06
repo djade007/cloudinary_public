@@ -1,7 +1,7 @@
 import 'package:cloudinary_public/cloudinary_public.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import 'package:http/http.dart';
+import 'package:http/http.dart' as http;
 
 /// The recognised file class to be used for this package
 class CloudinaryFile {
@@ -91,20 +91,31 @@ class CloudinaryFile {
       );
 
   /// Convert [CloudinaryFile] to [MultipartFile]
-  Future<MultipartFile> toMultipartFile([String fieldName = 'file']) async {
+  Future<http.MultipartFile> toMultipartFile(
+      [String fieldName = 'file']) async {
     assert(
       !fromExternalUrl,
       'toMultipartFile() not available when uploading from external urls',
     );
 
     if (byteData != null) {
-      return MultipartFile.fromBytes(
+      return http.MultipartFile.fromBytes(
         fieldName,
         byteData.buffer.asUint8List(),
         filename: identifier,
       );
     }
-    return MultipartFile.fromPath(
+
+    if (kIsWeb) {
+      final bytes = await http.readBytes(Uri.parse(filePath));
+      return http.MultipartFile.fromBytes(
+        fieldName,
+        bytes,
+        filename: identifier,
+      );
+    }
+
+    return http.MultipartFile.fromPath(
       fieldName,
       filePath,
       filename: identifier,
