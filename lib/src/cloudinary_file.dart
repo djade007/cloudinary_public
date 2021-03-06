@@ -1,7 +1,7 @@
 import 'package:cloudinary_public/cloudinary_public.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:http/http.dart';
 
 /// The recognised file class to be used for this package
 class CloudinaryFile {
@@ -26,6 +26,9 @@ class CloudinaryFile {
 
   /// File tags
   final List<String> tags;
+
+  /// Determine if initialized from [CloudinaryFile.fromUrl]
+  bool get fromExternalUrl => url != null;
 
   /// [CloudinaryFile] instance
   const CloudinaryFile(
@@ -88,16 +91,21 @@ class CloudinaryFile {
       );
 
   /// Convert [CloudinaryFile] to [MultipartFile]
-  MultipartFile toMultipartFile() {
-    if (url != null) return null;
+  Future<MultipartFile> toMultipartFile([String fieldName = 'file']) async {
+    assert(
+      !fromExternalUrl,
+      'toMultipartFile() not available when uploading from external urls',
+    );
 
     if (byteData != null) {
       return MultipartFile.fromBytes(
+        fieldName,
         byteData.buffer.asUint8List(),
         filename: identifier,
       );
     }
-    return MultipartFile.fromFileSync(
+    return MultipartFile.fromPath(
+      fieldName,
       filePath,
       filename: identifier,
     );

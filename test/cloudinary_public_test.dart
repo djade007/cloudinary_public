@@ -1,13 +1,12 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:cloudinary_public/cloudinary_public.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:http/http.dart' as http;
+import 'package:http/testing.dart';
 import 'package:matcher/matcher.dart';
-import 'package:mockito/mockito.dart';
-
-class MockClient extends Mock implements Dio {}
 
 File getFile() {
   File file = File('../test/icon.png');
@@ -23,17 +22,11 @@ const cloudName = 'demo';
 const uploadPreset = 'preset';
 
 void main() {
-  final client = MockClient();
-
-  // Use Mockito to return a successful response when it calls the
-  // provided dio.post
-  when(client.post(
-    'https://api.cloudinary.com/v1_1/$cloudName/image/upload',
-    data: anyNamed('data'),
-  )).thenAnswer(
-    (_) async => Response(
-      data: _sampleResponse,
-      statusCode: 200,
+  // mock http client
+  final client = MockClient(
+    (request) async => http.Response(
+      jsonEncode(_sampleResponse),
+      200,
     ),
   );
 
@@ -41,7 +34,7 @@ void main() {
     final cloudinary = CloudinaryPublic(
       cloudName,
       uploadPreset,
-      dioClient: client,
+      client: client,
       cache: true,
     );
 
@@ -68,7 +61,7 @@ void main() {
     final cloudinary = CloudinaryPublic(
       cloudName,
       uploadPreset,
-      dioClient: client,
+      client: client,
       cache: true,
     );
 
@@ -90,7 +83,7 @@ void main() {
     final cloudinary = CloudinaryPublic(
       cloudName,
       uploadPreset,
-      dioClient: client,
+      client: client,
       cache: true,
     );
 
@@ -115,7 +108,7 @@ void main() {
     final cloudinary = CloudinaryPublic(
       cloudName,
       uploadPreset,
-      dioClient: client,
+      client: client,
       cache: true,
     );
 
@@ -139,7 +132,7 @@ void main() {
     final cloudinary = CloudinaryPublic(
       cloudName,
       uploadPreset,
-      dioClient: client,
+      client: client,
       cache: true,
     );
 
@@ -163,7 +156,7 @@ void main() {
     final cloudinary = CloudinaryPublic(
       cloudName,
       uploadPreset,
-      dioClient: client,
+      client: client,
       cache: true,
     );
 
@@ -204,7 +197,7 @@ void main() {
     final cloudinary = CloudinaryPublic(
       cloudName,
       uploadPreset,
-      dioClient: client,
+      client: client,
       cache: true,
     );
 

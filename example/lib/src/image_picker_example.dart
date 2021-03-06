@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:cloudinary_public/cloudinary_public.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 
 import 'init.dart';
@@ -67,11 +66,8 @@ class _ImagePickerExampleState extends State<ImagePickerExample> {
 
     try {
       final res = await cloudinary.uploadFile(
-        CloudinaryFile.fromByteData(
-          ByteData.sublistView(
-            await _pickedFile.readAsBytes(),
-          ),
-          identifier: _pickedFile.path.split('.').last,
+        CloudinaryFile.fromFile(
+          _pickedFile.path,
         ),
       );
       print(res);

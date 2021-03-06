@@ -9,12 +9,11 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  dio: ^3.0.10
+  http: ^0.12.2
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  mockito: ^4.1.4
   matcher: ^0.12.9
 
 
