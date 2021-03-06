@@ -8,7 +8,8 @@ secretKey.
 
 ## Getting started
 
-Add the dependency `cloudinary_public: ^0.7.0` to your project and start using it:
+Add the dependency `cloudinary_public: ^0.8.0` to your project:
+(Use `^0.7.0` for non null safety)
 
 ```dart
 import 'package:cloudinary_public/cloudinary_public.dart';

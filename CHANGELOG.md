@@ -1,3 +1,6 @@
+## 0.8.0
+- Migrate to null safety
+
 ## 0.7.0
 - Added CloudinaryException
 - Replace Dio dependency with http

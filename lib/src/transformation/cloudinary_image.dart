@@ -4,9 +4,9 @@ class CloudinaryImage {
   static const String _baseUrl =
       'https://res.cloudinary.com/:cloud/image/upload/';
 
-  String _path;
-  String _publicId;
-  String _originalUrl;
+  late String _path;
+  late String _publicId;
+  late String _originalUrl;
 
   String get url => _originalUrl;
 

@@ -11,10 +11,10 @@ class CloudinaryException implements Exception {
   /// file information.
   /// It can be used to identify the exact uploaded file that fails during multi upload
   /// contains {url, path, identifier}
-  final Map<String, dynamic> request;
+  final Map<String, dynamic>? request;
 
   /// Extract the error message from cloudinary
-  String get message {
+  String? get message {
     try {
       return jsonDecode(responseString)['error']['message'];
     } catch (e) {

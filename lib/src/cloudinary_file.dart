@@ -6,16 +6,16 @@ import 'package:http/http.dart' as http;
 /// The recognised file class to be used for this package
 class CloudinaryFile {
   /// The [ByteData] file to be uploaded
-  final ByteData byteData;
+  final ByteData? byteData;
 
   /// The path of the [File] to be uploaded
-  final String filePath;
+  final String? filePath;
 
   /// The file name/path
-  final String identifier;
+  final String? identifier;
 
   /// External url
-  final String url;
+  final String? url;
 
   /// The cloudinary resource type to be uploaded
   /// see [CloudinaryResourceType.Auto] - default,
@@ -25,7 +25,7 @@ class CloudinaryFile {
   final CloudinaryResourceType resourceType;
 
   /// File tags
-  final List<String> tags;
+  final List<String>? tags;
 
   /// Determine if initialized from [CloudinaryFile.fromUrl]
   bool get fromExternalUrl => url != null;
@@ -36,7 +36,7 @@ class CloudinaryFile {
       this.filePath,
       this.identifier,
       this.url,
-      @required this.resourceType,
+      required this.resourceType,
       this.tags})
       : assert(
             (byteData == null && filePath != null) ||
@@ -46,9 +46,9 @@ class CloudinaryFile {
 
   /// Instantiate [CloudinaryFile] from future [ByteData]
   static Future<CloudinaryFile> fromFutureByteData(Future<ByteData> byteData,
-          {String identifier,
+          {String? identifier,
           CloudinaryResourceType resourceType: CloudinaryResourceType.Auto,
-          List<String> tags}) async =>
+          List<String>? tags}) async =>
       CloudinaryFile.fromByteData(
         await byteData,
         identifier: identifier,
@@ -58,9 +58,9 @@ class CloudinaryFile {
 
   /// Instantiate [CloudinaryFile] from [ByteData]
   factory CloudinaryFile.fromByteData(ByteData byteData,
-          {String identifier,
+          {String? identifier,
           CloudinaryResourceType resourceType: CloudinaryResourceType.Auto,
-          List<String> tags}) =>
+          List<String>? tags}) =>
       CloudinaryFile(
         byteData: byteData,
         identifier: identifier,
@@ -70,9 +70,9 @@ class CloudinaryFile {
 
   /// Instantiate [CloudinaryFile] from [File] path
   factory CloudinaryFile.fromFile(String path,
-          {String identifier,
+          {String? identifier,
           CloudinaryResourceType resourceType: CloudinaryResourceType.Auto,
-          List<String> tags}) =>
+          List<String>? tags}) =>
       CloudinaryFile(
         filePath: path,
         identifier: identifier ??= path.split('/').last,
@@ -83,7 +83,7 @@ class CloudinaryFile {
   /// Instantiate [CloudinaryFile] from an external url
   factory CloudinaryFile.fromUrl(String url,
           {CloudinaryResourceType resourceType: CloudinaryResourceType.Auto,
-          List<String> tags}) =>
+          List<String>? tags}) =>
       CloudinaryFile(
         url: url,
         identifier: url,
@@ -101,13 +101,13 @@ class CloudinaryFile {
     if (byteData != null) {
       return http.MultipartFile.fromBytes(
         fieldName,
-        byteData.buffer.asUint8List(),
+        byteData!.buffer.asUint8List(),
         filename: identifier,
       );
     }
 
     if (kIsWeb) {
-      final bytes = await http.readBytes(Uri.parse(filePath));
+      final bytes = await http.readBytes(Uri.parse(filePath!));
       return http.MultipartFile.fromBytes(
         fieldName,
         bytes,
@@ -117,7 +117,7 @@ class CloudinaryFile {
 
     return http.MultipartFile.fromPath(
       fieldName,
-      filePath,
+      filePath!,
       filename: identifier,
     );
   }

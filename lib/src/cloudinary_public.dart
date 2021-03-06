@@ -17,7 +17,7 @@ class CloudinaryPublic {
   static const _fieldName = 'file';
 
   /// To cache all the uploaded files in the current class instance
-  Map<String, CloudinaryResponse> _uploadedFiles = {};
+  Map<String?, CloudinaryResponse> _uploadedFiles = {};
 
   /// Cloud name from Cloudinary
   final String _cloudName;
@@ -29,7 +29,7 @@ class CloudinaryPublic {
   final bool cache;
 
   /// The http client to be used to upload files
-  http.Client client;
+  http.Client? client;
 
   CloudinaryPublic(
     this._cloudName,
@@ -48,7 +48,7 @@ class CloudinaryPublic {
   /// Upload multiple files together
   Future<List<CloudinaryResponse>> uploadFiles(
     List<CloudinaryFile> files, {
-    String uploadPreset,
+    String? uploadPreset,
   }) {
     return Future.wait(
       files.map(
@@ -61,13 +61,13 @@ class CloudinaryPublic {
   /// Override the default upload preset (when [CloudinaryPublic] is instantiated) with this one (if specified).
   Future<CloudinaryResponse> uploadFile(
     CloudinaryFile file, {
-    String uploadPreset,
+    String? uploadPreset,
   }) async {
     if (cache) {
       assert(file.identifier != null, 'identifier is required for caching');
 
       if (_uploadedFiles.containsKey(file.identifier))
-        return _uploadedFiles[file.identifier].enableCache();
+        return _uploadedFiles[file.identifier]!.enableCache();
     }
 
     final url = '$_baseUrl/$_cloudName/'
@@ -88,20 +88,20 @@ class CloudinaryPublic {
     };
 
     if (file.fromExternalUrl) {
-      data[_fieldName] = file.url;
+      data[_fieldName] = file.url!;
     } else {
       request.files.add(
         await file.toMultipartFile(_fieldName),
       );
     }
 
-    if (file.tags != null && file.tags.isNotEmpty) {
-      data['tags'] = file.tags.join(',');
+    if (file.tags != null && file.tags!.isNotEmpty) {
+      data['tags'] = file.tags!.join(',');
     }
 
     request.fields.addAll(data);
 
-    final sendRequest = await client.send(request);
+    final sendRequest = await client!.send(request);
 
     final res = await http.Response.fromStream(sendRequest);
 
@@ -127,7 +127,7 @@ class CloudinaryPublic {
   /// Upload the file using [uploadFile]
   Future<CloudinaryResponse> uploadFutureFile(
     Future<CloudinaryFile> file, {
-    String uploadPreset,
+    String? uploadPreset,
   }) async {
     return uploadFile(await file, uploadPreset: uploadPreset);
   }
@@ -135,7 +135,7 @@ class CloudinaryPublic {
   /// Upload multiple files using simultaneously [uploadFutureFile]
   Future<List<CloudinaryResponse>> multiUpload(
     List<Future<CloudinaryFile>> files, {
-    String uploadPreset,
+    String? uploadPreset,
   }) async {
     return Future.wait(
       files.map(

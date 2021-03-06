@@ -1,12 +1,12 @@
 /// Class to be used to format response from the cloudinary api
 class CloudinaryResponse {
-  final String assetId;
-  final String publicId;
-  final DateTime createdAt;
-  final String url;
-  final String secureUrl;
-  final String originalFilename;
-  final List<String> tags;
+  final String? assetId;
+  final String? publicId;
+  final DateTime? createdAt;
+  final String? url;
+  final String? secureUrl;
+  final String? originalFilename;
+  final List<String>? tags;
   final bool fromCache;
 
   CloudinaryResponse({
