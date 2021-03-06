@@ -1,3 +1,7 @@
+## 0.7.0
+- Added CloudinaryException
+- Replace Dio dependency with http
+
 ## 0.6.2
 - Added option to override default upload_preset 
 
