@@ -2,6 +2,7 @@ import 'package:cloudinary_public/cloudinary_public.dart';
 import 'package:flutter/material.dart';
 import 'package:multi_image_picker/multi_image_picker.dart';
 
+// todo: copy .init.example.dart to init.dart
 import 'init.dart';
 
 class MultiImagePickerExample extends StatefulWidget {

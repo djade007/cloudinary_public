@@ -37,7 +37,7 @@ class CloudinaryPublic {
     this.cache = false,
     this.client,
   }) {
-    /// set default dio client
+    /// set default http client
     client ??= http.Client();
   }
 

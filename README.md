@@ -8,14 +8,15 @@ secretKey.
 
 ## Getting started
 
-Add the dependency `cloudinary_public: ^0.8.0` to your project:
-(Use `^0.7.0` for non null safety)
+Add the dependency `cloudinary_public: ^0.8.1+1` to your project:
 
 ```dart
 import 'package:cloudinary_public/cloudinary_public.dart';
 
 final cloudinary = CloudinaryPublic('CLOUD_NAME', 'UPLOAD_PRESET', cache: false);
 ```
+
+Check https://cloudinary.com/documentation/upload_images#unsigned_upload on how to create an upload preset.
 
 ### Using [Image Picker](https://pub.dev/packages/image_picker) Plugin
 
