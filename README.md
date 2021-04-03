@@ -34,7 +34,7 @@ try {
 }
 ```
 
-### Using [Multi Image Picker](https://https://pub.dev/packages/multi_image_picker) Plugin
+### Using [Multi Image Picker](https://pub.dev/packages/multi_image_picker) Plugin
 
 ```
 final images = await MultiImagePicker.pickImages(maxImages: 4);
