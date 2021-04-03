@@ -36,7 +36,7 @@ class Transformation {
     return param('q', value);
   }
 
-  Transformation radius(int value) {
+  Transformation radius(dynamic value) {
     return param('r', value);
   }
 
@@ -60,7 +60,7 @@ class Transformation {
     return param('u', cloudinaryImage.publicId.replaceAll('/', ':'));
   }
 
-  String? generate() {
+  String generate() {
     if (_params.isNotEmpty) {
       _chains.add(_params);
     }
@@ -106,6 +106,6 @@ class Transformation {
 
   @override
   String toString() {
-    return generate()!;
+    return generate();
   }
 }
