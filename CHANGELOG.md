@@ -1,3 +1,6 @@
+## 0.8.2
+- Add folder option to CloudinaryFile
+
 ## 0.8.1+1
 
 - Update readme and example file
