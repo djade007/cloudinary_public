@@ -14,6 +14,11 @@ class CloudinaryFile {
   /// The file name/path
   final String? identifier;
 
+  /// An optional folder name where the uploaded asset will be stored.
+  /// The public ID will contain the full path of the uploaded asset,
+  /// including the folder name.
+  final String? folder;
+
   /// External url
   final String? url;
 
@@ -31,14 +36,15 @@ class CloudinaryFile {
   bool get fromExternalUrl => url != null;
 
   /// [CloudinaryFile] instance
-  const CloudinaryFile(
-      {this.byteData,
-      this.filePath,
-      this.identifier,
-      this.url,
-      required this.resourceType,
-      this.tags})
-      : assert(
+  const CloudinaryFile({
+    this.resourceType: CloudinaryResourceType.Auto,
+    this.byteData,
+    this.filePath,
+    this.identifier,
+    this.url,
+    this.tags,
+    this.folder,
+  }) : assert(
             (byteData == null && filePath != null) ||
                 (byteData != null && filePath == null) ||
                 url != null,
@@ -57,37 +63,49 @@ class CloudinaryFile {
       );
 
   /// Instantiate [CloudinaryFile] from [ByteData]
-  factory CloudinaryFile.fromByteData(ByteData byteData,
-          {String? identifier,
-          CloudinaryResourceType resourceType: CloudinaryResourceType.Auto,
-          List<String>? tags}) =>
+  factory CloudinaryFile.fromByteData(
+    ByteData byteData, {
+    String? identifier,
+    CloudinaryResourceType resourceType: CloudinaryResourceType.Auto,
+    List<String>? tags,
+    String? folder,
+  }) =>
       CloudinaryFile(
         byteData: byteData,
         identifier: identifier,
         resourceType: resourceType,
         tags: tags,
+        folder: folder,
       );
 
   /// Instantiate [CloudinaryFile] from [File] path
-  factory CloudinaryFile.fromFile(String path,
-          {String? identifier,
-          CloudinaryResourceType resourceType: CloudinaryResourceType.Auto,
-          List<String>? tags}) =>
+  factory CloudinaryFile.fromFile(
+    String path, {
+    String? identifier,
+    CloudinaryResourceType resourceType: CloudinaryResourceType.Auto,
+    List<String>? tags,
+    String? folder,
+  }) =>
       CloudinaryFile(
         filePath: path,
         identifier: identifier ??= path.split('/').last,
         resourceType: resourceType,
         tags: tags,
+        folder: folder,
       );
 
   /// Instantiate [CloudinaryFile] from an external url
-  factory CloudinaryFile.fromUrl(String url,
-          {CloudinaryResourceType resourceType: CloudinaryResourceType.Auto,
-          List<String>? tags}) =>
+  factory CloudinaryFile.fromUrl(
+    String url, {
+    CloudinaryResourceType resourceType: CloudinaryResourceType.Auto,
+    List<String>? tags,
+    String? folder,
+  }) =>
       CloudinaryFile(
         url: url,
         identifier: url,
         resourceType: resourceType,
+        folder: folder,
       );
 
   /// Convert [CloudinaryFile] to [MultipartFile]

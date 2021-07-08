@@ -95,6 +95,10 @@ class CloudinaryPublic {
       );
     }
 
+    if (file.folder != null) {
+      data['folder'] = file.folder!;
+    }
+
     if (file.tags != null && file.tags!.isNotEmpty) {
       data['tags'] = file.tags!.join(',');
     }

@@ -1,4 +1,4 @@
-import 'package:example/src/multi_image_picker_example.dart';
+import 'package:example/src/image_picker_example.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -14,8 +14,8 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      // home: ImagePickerExample(),
-      home: MultiImagePickerExample(),
+      home: ImagePickerExample(),
+      // home: MultiImagePickerExample(),
     );
   }
 }

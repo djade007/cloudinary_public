@@ -69,6 +69,7 @@ class _ImagePickerExampleState extends State<ImagePickerExample> {
       final res = await cloudinary.uploadFile(
         CloudinaryFile.fromFile(
           _pickedFile.path,
+          folder: 'hello-folder',
         ),
       );
       print(res);
