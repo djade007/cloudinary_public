@@ -11,12 +11,17 @@ main() async {
 
   // Using a file. For example, gotten from: https://pub.dev/packages/image_picker
   File file = File('');
-  CloudinaryResponse response = await cloudinary.uploadFile(
-    CloudinaryFile.fromFile(file.path,
-        resourceType: CloudinaryResourceType.Image),
-  );
+  try {
+    CloudinaryResponse response = await cloudinary.uploadFile(
+      CloudinaryFile.fromFile(file.path,
+          resourceType: CloudinaryResourceType.Image),
+    );
 
-  print(response.secureUrl);
+    print(response.secureUrl);
+  } on CloudinaryException catch (e) {
+    print(e.message);
+    print(e.request);
+  }
 
   // Using Byte Data. For example gotten from: https://pub.dev/packages/multi_image_picker
   //  final images = await MultiImagePicker.pickImages(maxImages: 4);

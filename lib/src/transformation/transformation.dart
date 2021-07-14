@@ -36,7 +36,7 @@ class Transformation {
     return param('q', value);
   }
 
-  Transformation radius(int value) {
+  Transformation radius(dynamic value) {
     return param('r', value);
   }
 

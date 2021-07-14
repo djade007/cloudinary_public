@@ -10,25 +10,25 @@ class CloudinaryResponse {
   final bool fromCache;
 
   CloudinaryResponse({
-    this.assetId,
-    this.publicId,
-    this.createdAt,
-    this.url,
-    this.secureUrl,
-    this.originalFilename,
-    this.tags,
+    required this.assetId,
+    required this.publicId,
+    required this.createdAt,
+    required this.url,
+    required this.secureUrl,
+    required this.originalFilename,
+    this.tags: const [],
     this.fromCache: false,
   });
 
   /// Instantiate this class from a map data
   factory CloudinaryResponse.fromMap(Map<String, dynamic> data) {
     return CloudinaryResponse(
-      assetId: data['asset_id'],
-      publicId: data['public_id'],
+      assetId: data['asset_id'] ?? '',
+      publicId: data['public_id'] ?? '',
       createdAt: DateTime.parse(data['created_at']),
-      url: data['url'],
-      secureUrl: data['secure_url'],
-      originalFilename: data['original_filename'],
+      url: data['url'] ?? '',
+      secureUrl: data['secure_url'] ?? '',
+      originalFilename: data['original_filename'] ?? '',
       tags: data['tags'] != null
           ? (data['tags'] as List).map((tag) => tag as String).toList()
           : [],
