@@ -32,6 +32,12 @@ class CloudinaryFile {
   /// File tags
   final List<String>? tags;
 
+  /// A pipe-separated list of the key-value pairs of contextual metadata to
+  /// attach to an uploaded asset.
+  ///
+  /// Eg: {'alt': 'My image', 'caption': 'Profile image'}
+  final Map<String, dynamic>? context;
+
   /// Determine if initialized from [CloudinaryFile.fromUrl]
   bool get fromExternalUrl => url != null;
 
@@ -44,6 +50,7 @@ class CloudinaryFile {
     this.url,
     this.tags,
     this.folder,
+    this.context,
   }) : assert(
             (byteData == null && filePath != null) ||
                 (byteData != null && filePath == null) ||
@@ -69,14 +76,17 @@ class CloudinaryFile {
     CloudinaryResourceType resourceType: CloudinaryResourceType.Auto,
     List<String>? tags,
     String? folder,
-  }) =>
-      CloudinaryFile(
-        byteData: byteData,
-        identifier: identifier,
-        resourceType: resourceType,
-        tags: tags,
-        folder: folder,
-      );
+    Map<String, dynamic>? context,
+  }) {
+    return CloudinaryFile(
+      byteData: byteData,
+      identifier: identifier,
+      resourceType: resourceType,
+      tags: tags,
+      folder: folder,
+      context: context,
+    );
+  }
 
   /// Instantiate [CloudinaryFile] from [File] path
   factory CloudinaryFile.fromFile(
@@ -85,14 +95,17 @@ class CloudinaryFile {
     CloudinaryResourceType resourceType: CloudinaryResourceType.Auto,
     List<String>? tags,
     String? folder,
-  }) =>
-      CloudinaryFile(
-        filePath: path,
-        identifier: identifier ??= path.split('/').last,
-        resourceType: resourceType,
-        tags: tags,
-        folder: folder,
-      );
+    Map<String, dynamic>? context,
+  }) {
+    return CloudinaryFile(
+      filePath: path,
+      identifier: identifier ??= path.split('/').last,
+      resourceType: resourceType,
+      tags: tags,
+      folder: folder,
+      context: context,
+    );
+  }
 
   /// Instantiate [CloudinaryFile] from an external url
   factory CloudinaryFile.fromUrl(
@@ -100,13 +113,16 @@ class CloudinaryFile {
     CloudinaryResourceType resourceType: CloudinaryResourceType.Auto,
     List<String>? tags,
     String? folder,
-  }) =>
-      CloudinaryFile(
-        url: url,
-        identifier: url,
-        resourceType: resourceType,
-        folder: folder,
-      );
+    Map<String, dynamic>? context,
+  }) {
+    return CloudinaryFile(
+      url: url,
+      identifier: url,
+      resourceType: resourceType,
+      folder: folder,
+      context: context,
+    );
+  }
 
   /// Convert [CloudinaryFile] to [MultipartFile]
   Future<http.MultipartFile> toMultipartFile(

@@ -103,6 +103,17 @@ class CloudinaryPublic {
       data['tags'] = file.tags!.join(',');
     }
 
+    if (file.context != null && file.context!.isNotEmpty) {
+      String context = '';
+
+      file.context!.forEach((key, value) {
+        context += '|$key=$value';
+      });
+
+      // remove the extra `|` at the beginning
+      data['context'] = context.replaceFirst('|', '');
+    }
+
     request.fields.addAll(data);
 
     final sendRequest = await client!.send(request);
@@ -110,11 +121,15 @@ class CloudinaryPublic {
     final res = await http.Response.fromStream(sendRequest);
 
     if (res.statusCode != 200) {
-      throw CloudinaryException(res.body, res.statusCode, request: {
-        'url': file.url,
-        'path': file.filePath,
-        'identifier': file.identifier,
-      });
+      throw CloudinaryException(
+        res.body,
+        res.statusCode,
+        request: {
+          'url': file.url,
+          'path': file.filePath,
+          'identifier': file.identifier,
+        },
+      );
     }
 
     final cloudinaryResponse = CloudinaryResponse.fromMap(

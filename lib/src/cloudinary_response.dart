@@ -7,7 +7,15 @@ class CloudinaryResponse {
   final String secureUrl;
   final String originalFilename;
   final List<String> tags;
+  final Map<String, dynamic> context;
   final bool fromCache;
+
+  /// Extract and return the image context
+  Map<String, String> get customContext {
+    if (context['custom'] != null) return Map.castFrom(context['custom']);
+
+    return {};
+  }
 
   CloudinaryResponse({
     required this.assetId,
@@ -17,6 +25,7 @@ class CloudinaryResponse {
     required this.secureUrl,
     required this.originalFilename,
     this.tags: const [],
+    this.context: const {},
     this.fromCache: false,
   });
 
@@ -32,6 +41,7 @@ class CloudinaryResponse {
       tags: data['tags'] != null
           ? (data['tags'] as List).map((tag) => tag as String).toList()
           : [],
+      context: data['context'] is Map ? data['context'] : {},
     );
   }
 
@@ -45,6 +55,7 @@ class CloudinaryResponse {
       secureUrl: secureUrl,
       originalFilename: originalFilename,
       tags: tags,
+      context: context,
       fromCache: true,
     );
   }
@@ -59,6 +70,7 @@ class CloudinaryResponse {
       'secure_url': secureUrl,
       'original_filename': originalFilename,
       'tags': tags,
+      'context': context,
     };
   }
 

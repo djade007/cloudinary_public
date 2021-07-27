@@ -70,6 +70,10 @@ class _ImagePickerExampleState extends State<ImagePickerExample> {
         CloudinaryFile.fromFile(
           _pickedFile.path,
           folder: 'hello-folder',
+          context: {
+            'alt': 'Hello',
+            'caption': 'An example image',
+          },
         ),
       );
       print(res);

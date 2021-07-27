@@ -1,5 +1,8 @@
+## 0.9.0
+- Add context option [CloudinaryFile]
+
 ## 0.8.2
-- Add folder option to CloudinaryFile
+- Add folder option to [CloudinaryFile]
 
 ## 0.8.1+1
 
@@ -11,7 +14,7 @@
 
 ## 0.7.0
 
-- Added CloudinaryException
+- Added [CloudinaryException]
 - Replace Dio dependency with http
 
 ## 0.6.2
