@@ -66,7 +66,13 @@ void main() {
     );
 
     final file = CloudinaryFile.fromFile(tempFile.path,
-        resourceType: CloudinaryResourceType.Image, tags: ['trip']);
+        resourceType: CloudinaryResourceType.Image,
+        tags: [
+          'trip'
+        ],
+        context: {
+          'alt': 'Image',
+        });
     final res = await cloudinary.uploadFile(file);
     expect(res, TypeMatcher<CloudinaryResponse>());
 
@@ -229,5 +235,11 @@ const _sampleResponse = {
       'http://res.cloudinary.com/$cloudName/image/upload/v1590212116/psryios0nkgpf1h4um3h.jpg',
   'secure_url':
       'https://res.cloudinary.com/$cloudName/image/upload/v1590212116/psryios0nkgpf1h4um3h.jpg',
-  'original_filename': '001'
+  'original_filename': '001',
+  'context': {
+    'custom': {
+      'alt': 'image',
+      'caption': 'Example image',
+    }
+  }
 };
