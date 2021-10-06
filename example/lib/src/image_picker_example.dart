@@ -17,6 +17,7 @@ class _ImagePickerExampleState extends State<ImagePickerExample> {
   final picker = ImagePicker();
   PickedFile _pickedFile;
   bool _uploading = false;
+  double _uploadingPercentage = 0.0;
 
   Future getImage() async {
     final image = await picker.getImage(source: ImageSource.gallery);
@@ -54,7 +55,9 @@ class _ImagePickerExampleState extends State<ImagePickerExample> {
         _buildImage(),
         TextButton(
           onPressed: _uploading ? null : _upload,
-          child: _uploading ? Text('Uploading...') : Text('Upload'),
+          child: _uploading
+              ? Text('${_uploadingPercentage.toStringAsFixed(2)}%')
+              : Text('Upload'),
         ),
       ],
     );
@@ -75,6 +78,11 @@ class _ImagePickerExampleState extends State<ImagePickerExample> {
             'caption': 'An example image',
           },
         ),
+        onSendProgress: (count, total) {
+          setState(() {
+            _uploadingPercentage = (count / total) * 100;
+          });
+        },
       );
       print(res);
     } on CloudinaryException catch (e) {
@@ -84,6 +92,7 @@ class _ImagePickerExampleState extends State<ImagePickerExample> {
 
     setState(() {
       _uploading = false;
+      _uploadingPercentage = 0.0;
     });
   }
 

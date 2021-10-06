@@ -1,12 +1,15 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:cloudinary_public/cloudinary_public.dart';
 import 'package:cloudinary_public/src/exceptions/cloudinary_exception.dart';
+import 'package:cloudinary_public/src/progress_callback.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 import './cloudinary_response.dart';
 import '../cloudinary_public.dart';
+import 'multipart_request.dart';
 
 /// The base class for this package
 class CloudinaryPublic {
@@ -62,6 +65,7 @@ class CloudinaryPublic {
   Future<CloudinaryResponse> uploadFile(
     CloudinaryFile file, {
     String? uploadPreset,
+    ProgressCallback? onSendProgress,
   }) async {
     if (cache) {
       assert(file.identifier != null, 'identifier is required for caching');
@@ -74,9 +78,12 @@ class CloudinaryPublic {
         '${describeEnum(file.resourceType).toLowerCase()}'
         '/upload';
 
-    final request = http.MultipartRequest(
+    final request = MultipartRequest(
       'POST',
       Uri.parse(url),
+      onProgress: (count, total) {
+        onSendProgress?.call(count, total);
+      },
     );
 
     request.headers.addAll({
@@ -147,8 +154,13 @@ class CloudinaryPublic {
   Future<CloudinaryResponse> uploadFutureFile(
     Future<CloudinaryFile> file, {
     String? uploadPreset,
+    ProgressCallback? onSendProgress,
   }) async {
-    return uploadFile(await file, uploadPreset: uploadPreset);
+    return uploadFile(
+      await file,
+      uploadPreset: uploadPreset,
+      onSendProgress: onSendProgress,
+    );
   }
 
   /// Upload multiple files using simultaneously [uploadFutureFile]
