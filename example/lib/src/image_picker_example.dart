@@ -78,7 +78,7 @@ class _ImagePickerExampleState extends State<ImagePickerExample> {
             'caption': 'An example image',
           },
         ),
-        onSendProgress: (count, total) {
+        onProgress: (count, total) {
           setState(() {
             _uploadingPercentage = (count / total) * 100;
           });

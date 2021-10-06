@@ -65,7 +65,7 @@ class CloudinaryPublic {
   Future<CloudinaryResponse> uploadFile(
     CloudinaryFile file, {
     String? uploadPreset,
-    ProgressCallback? onSendProgress,
+    ProgressCallback? onProgress,
   }) async {
     if (cache) {
       assert(file.identifier != null, 'identifier is required for caching');
@@ -82,7 +82,7 @@ class CloudinaryPublic {
       'POST',
       Uri.parse(url),
       onProgress: (count, total) {
-        onSendProgress?.call(count, total);
+        onProgress?.call(count, total);
       },
     );
 
@@ -154,12 +154,12 @@ class CloudinaryPublic {
   Future<CloudinaryResponse> uploadFutureFile(
     Future<CloudinaryFile> file, {
     String? uploadPreset,
-    ProgressCallback? onSendProgress,
+    ProgressCallback? onProgress,
   }) async {
     return uploadFile(
       await file,
       uploadPreset: uploadPreset,
-      onSendProgress: onSendProgress,
+      onProgress: onProgress,
     );
   }
 
