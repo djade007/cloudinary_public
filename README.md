@@ -91,3 +91,22 @@ final url = cloudinaryImage.transform()
 // generates
 // https://res.cloudinary.com/demo/image/upload/c_thumb,g_face,h_150,w_150/r_20/e_sepia/e_brightness:200,g_south_east,l_cloudinary_icon,o_60,w_50,x_5,y_5/a_10/front_face.png
 ```
+
+## Upload Progress
+```dart
+final res = await cloudinary.uploadFile(
+  CloudinaryFile.fromFile(
+    _pickedFile.path,
+    folder: 'hello-folder',
+    context: {
+      'alt': 'Hello',
+      'caption': 'An example image',
+    },
+  ),
+  onProgress: (count, total) {
+    setState(() {
+      _uploadingPercentage = (count / total) * 100;
+    });
+  },
+);
+```
