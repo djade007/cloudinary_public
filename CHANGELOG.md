@@ -1,5 +1,8 @@
+## 0.10.0
+- Add upload progress indicator
+
 ## 0.9.0
-- Add context option [CloudinaryFile]
+- Add context option to [CloudinaryFile]
 
 ## 0.8.2
 - Add folder option to [CloudinaryFile]
