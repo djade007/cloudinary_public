@@ -1,3 +1,6 @@
+## 0.11.0
+- Add support for bytes data.
+
 ## 0.10.0
 - Add upload progress indicator
 
