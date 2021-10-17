@@ -8,6 +8,9 @@ class CloudinaryFile {
   /// The [ByteData] file to be uploaded
   final ByteData? byteData;
 
+  /// The bytes data to be uploaded
+  final List<int>? bytesData;
+
   /// The path of the [File] to be uploaded
   final String? filePath;
 
@@ -42,20 +45,17 @@ class CloudinaryFile {
   bool get fromExternalUrl => url != null;
 
   /// [CloudinaryFile] instance
-  const CloudinaryFile({
+  const CloudinaryFile._({
     this.resourceType: CloudinaryResourceType.Auto,
     this.byteData,
+    this.bytesData,
     this.filePath,
     this.identifier,
     this.url,
     this.tags,
     this.folder,
     this.context,
-  }) : assert(
-            (byteData == null && filePath != null) ||
-                (byteData != null && filePath == null) ||
-                url != null,
-            'Only one between byteData or file must be provided');
+  });
 
   /// Instantiate [CloudinaryFile] from future [ByteData]
   static Future<CloudinaryFile> fromFutureByteData(Future<ByteData> byteData,
@@ -78,8 +78,27 @@ class CloudinaryFile {
     String? folder,
     Map<String, dynamic>? context,
   }) {
-    return CloudinaryFile(
+    return CloudinaryFile._(
       byteData: byteData,
+      identifier: identifier,
+      resourceType: resourceType,
+      tags: tags,
+      folder: folder,
+      context: context,
+    );
+  }
+
+  /// Instantiate [CloudinaryFile] from [ByteData]
+  factory CloudinaryFile.fromBytesData(
+    List<int> bytesData, {
+    String? identifier,
+    CloudinaryResourceType resourceType: CloudinaryResourceType.Auto,
+    List<String>? tags,
+    String? folder,
+    Map<String, dynamic>? context,
+  }) {
+    return CloudinaryFile._(
+      bytesData: bytesData,
       identifier: identifier,
       resourceType: resourceType,
       tags: tags,
@@ -97,7 +116,7 @@ class CloudinaryFile {
     String? folder,
     Map<String, dynamic>? context,
   }) {
-    return CloudinaryFile(
+    return CloudinaryFile._(
       filePath: path,
       identifier: identifier ??= path.split('/').last,
       resourceType: resourceType,
@@ -115,7 +134,7 @@ class CloudinaryFile {
     String? folder,
     Map<String, dynamic>? context,
   }) {
-    return CloudinaryFile(
+    return CloudinaryFile._(
       url: url,
       identifier: url,
       resourceType: resourceType,
@@ -136,6 +155,14 @@ class CloudinaryFile {
       return http.MultipartFile.fromBytes(
         fieldName,
         byteData!.buffer.asUint8List(),
+        filename: identifier,
+      );
+    }
+
+    if (bytesData != null) {
+      return http.MultipartFile.fromBytes(
+        fieldName,
+        bytesData!,
         filename: identifier,
       );
     }
