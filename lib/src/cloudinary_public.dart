@@ -2,12 +2,10 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:cloudinary_public/cloudinary_public.dart';
-import 'package:cloudinary_public/src/exceptions/cloudinary_exception.dart';
 import 'package:cloudinary_public/src/progress_callback.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
-import './cloudinary_response.dart';
 import '../cloudinary_public.dart';
 import 'multipart_request.dart';
 

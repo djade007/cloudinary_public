@@ -1,3 +1,6 @@
+## 0.11.1
+- Update dependencies
+
 ## 0.11.0
 - Add support for bytes data.
 
