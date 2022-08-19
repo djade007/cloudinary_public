@@ -1,4 +1,4 @@
-## 0.11.1
+## 0.12.0
 - Update dependencies
 
 ## 0.11.0
