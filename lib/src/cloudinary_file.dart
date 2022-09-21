@@ -14,6 +14,9 @@ class CloudinaryFile {
   /// The path of the [File] to be uploaded
   final String? filePath;
 
+  /// The file public id which will be used to name the file
+  final String? publicId;
+
   /// The file name/path
   final String? identifier;
 
@@ -50,6 +53,7 @@ class CloudinaryFile {
     this.byteData,
     this.bytesData,
     this.filePath,
+    this.publicId,
     this.identifier,
     this.url,
     this.tags,
@@ -59,11 +63,13 @@ class CloudinaryFile {
 
   /// Instantiate [CloudinaryFile] from future [ByteData]
   static Future<CloudinaryFile> fromFutureByteData(Future<ByteData> byteData,
-          {String? identifier,
+          {String? publicId,
+          String? identifier,
           CloudinaryResourceType resourceType: CloudinaryResourceType.Auto,
           List<String>? tags}) async =>
       CloudinaryFile.fromByteData(
         await byteData,
+        publicId: publicId,
         identifier: identifier,
         resourceType: resourceType,
         tags: tags,
@@ -72,6 +78,7 @@ class CloudinaryFile {
   /// Instantiate [CloudinaryFile] from [ByteData]
   factory CloudinaryFile.fromByteData(
     ByteData byteData, {
+    String? publicId,
     String? identifier,
     CloudinaryResourceType resourceType: CloudinaryResourceType.Auto,
     List<String>? tags,
@@ -80,6 +87,7 @@ class CloudinaryFile {
   }) {
     return CloudinaryFile._(
       byteData: byteData,
+      publicId: publicId,
       identifier: identifier,
       resourceType: resourceType,
       tags: tags,
@@ -91,6 +99,7 @@ class CloudinaryFile {
   /// Instantiate [CloudinaryFile] from [ByteData]
   factory CloudinaryFile.fromBytesData(
     List<int> bytesData, {
+      String? publicId,
     String? identifier,
     CloudinaryResourceType resourceType: CloudinaryResourceType.Auto,
     List<String>? tags,
@@ -99,6 +108,7 @@ class CloudinaryFile {
   }) {
     return CloudinaryFile._(
       bytesData: bytesData,
+      publicId: publicId,
       identifier: identifier,
       resourceType: resourceType,
       tags: tags,
@@ -110,6 +120,7 @@ class CloudinaryFile {
   /// Instantiate [CloudinaryFile] from [File] path
   factory CloudinaryFile.fromFile(
     String path, {
+    String? publicId,
     String? identifier,
     CloudinaryResourceType resourceType: CloudinaryResourceType.Auto,
     List<String>? tags,
@@ -118,6 +129,7 @@ class CloudinaryFile {
   }) {
     return CloudinaryFile._(
       filePath: path,
+      publicId: publicId,
       identifier: identifier ??= path.split('/').last,
       resourceType: resourceType,
       tags: tags,
@@ -144,8 +156,7 @@ class CloudinaryFile {
   }
 
   /// Convert [CloudinaryFile] to [MultipartFile]
-  Future<http.MultipartFile> toMultipartFile(
-      [String fieldName = 'file']) async {
+  Future<http.MultipartFile> toMultipartFile([String fieldName = 'file']) async {
     assert(
       !fromExternalUrl,
       'toMultipartFile() not available when uploading from external urls',
