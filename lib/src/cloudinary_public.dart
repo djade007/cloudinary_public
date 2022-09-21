@@ -100,6 +100,10 @@ class CloudinaryPublic {
       );
     }
 
+    if (file.publicId != null) {
+      data['public_id'] = file.publicId!;
+    }
+
     if (file.folder != null) {
       data['folder'] = file.folder!;
     }
@@ -132,6 +136,7 @@ class CloudinaryPublic {
         request: {
           'url': file.url,
           'path': file.filePath,
+          'public_id': file.identifier,
           'identifier': file.identifier,
         },
       );
