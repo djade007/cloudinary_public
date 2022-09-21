@@ -1,3 +1,6 @@
+## 0.13.0
+- add public_id option
+
 ## 0.12.0
 - Update dependencies
 

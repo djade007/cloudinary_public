@@ -6,7 +6,6 @@ import 'package:cloudinary_public/src/progress_callback.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
-import '../cloudinary_public.dart';
 import 'multipart_request.dart';
 
 /// The base class for this package

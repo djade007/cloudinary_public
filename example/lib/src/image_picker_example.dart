@@ -15,12 +15,12 @@ class ImagePickerExample extends StatefulWidget {
 
 class _ImagePickerExampleState extends State<ImagePickerExample> {
   final picker = ImagePicker();
-  PickedFile _pickedFile;
+  XFile? _pickedFile;
   bool _uploading = false;
   double _uploadingPercentage = 0.0;
 
   Future getImage() async {
-    final image = await picker.getImage(source: ImageSource.gallery);
+    final image = await picker.pickImage(source: ImageSource.gallery);
 
     setState(() {
       if (image != null) {
@@ -64,6 +64,8 @@ class _ImagePickerExampleState extends State<ImagePickerExample> {
   }
 
   Future<void> _upload() async {
+    if(_pickedFile == null) return;
+
     setState(() {
       _uploading = true;
     });
@@ -71,7 +73,7 @@ class _ImagePickerExampleState extends State<ImagePickerExample> {
     try {
       final res = await cloudinary.uploadFile(
         CloudinaryFile.fromFile(
-          _pickedFile.path,
+          _pickedFile!.path,
           folder: 'hello-folder',
           context: {
             'alt': 'Hello',
@@ -98,8 +100,8 @@ class _ImagePickerExampleState extends State<ImagePickerExample> {
 
   Widget _buildImage() {
     if (kIsWeb) {
-      return Image.network(_pickedFile.path);
+      return Image.network(_pickedFile!.path);
     }
-    return Image.file(File(_pickedFile.path));
+    return Image.file(File(_pickedFile!.path));
   }
 }
