@@ -1,12 +1,11 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:math';
+import 'package:path/path.dart' as path;
 
 import 'package:cloudinary_public/cloudinary_public.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import 'package:path/path.dart' as path;
-
 
 /// The base class for this package
 class CloudinaryPublic {
@@ -47,7 +46,7 @@ class CloudinaryPublic {
   }
 
   String _createUrl(CloudinaryResourceType type) {
-    return '$_cloudName/'
+    return '$_baseUrl/$_cloudName/'
         '${describeEnum(type).toLowerCase()}'
         '/upload';
   }
@@ -82,7 +81,8 @@ class CloudinaryPublic {
         return _uploadedFiles[file.identifier]!.enableCache();
     }
 
-    Map<String, dynamic> data = generateFormData(file, uploadPreset: uploadPreset);
+    Map<String, dynamic> data =
+        generateFormData(file, uploadPreset: uploadPreset);
 
     if (file.fromExternalUrl) {
       data[_fieldName] = file.url!;
@@ -93,12 +93,7 @@ class CloudinaryPublic {
     var response = await _dio.post(
       _createUrl(file.resourceType),
       data: FormData.fromMap(data),
-      onSendProgress: (int sent, int total) {
-        print("sent: $sent, total: $total");
-        if (onProgress != null) {
-          onProgress(sent, total);
-        }
-      },
+      onSendProgress: onProgress,
     );
 
     if (response.statusCode != 200) {
@@ -150,7 +145,7 @@ class CloudinaryPublic {
     );
   }
 
-  /// Upload file in chunks 
+  /// Upload file in chunks
   /// default chunk size is 10 MB
   Future<CloudinaryResponse?> uploadFileInChunks(
     CloudinaryFile file, {
@@ -161,26 +156,29 @@ class CloudinaryPublic {
     CloudinaryResponse? cloudinaryResponse;
     if (file.filePath == null) return null;
     final tempFile = File(file.filePath!);
+    final fileName = path.basename(file.filePath!);
 
     Response? finalResponse;
 
     int _fileSize = tempFile.lengthSync(); // 100MB
-  
+
     int _maxChunkSize = min(_fileSize, chunkSize);
 
     int _chunksCount = (_fileSize / _maxChunkSize).ceil();
 
-     Map<String, dynamic> data = generateFormData(file, uploadPreset: uploadPreset);
+    Map<String, dynamic> data =
+        generateFormData(file, uploadPreset: uploadPreset);
 
     try {
       for (int i = 0; i < _chunksCount; i++) {
         print('uploadVideoInChunks chunk $i of $_chunksCount');
         final start = i * _maxChunkSize;
         final end = min((i + 1) * _maxChunkSize, _fileSize);
+        final chunkStream = tempFile.openRead(start, end);
 
         final formData = FormData.fromMap({
-          "file": file.toMultipartFileChunked(start, end),
-          ...data
+          "file": MultipartFile(chunkStream, end - start, filename: fileName),
+          ...data,
         });
 
         finalResponse = await _dio.post(
@@ -194,11 +192,11 @@ class CloudinaryPublic {
               'Content-Range': 'bytes $start-${end - 1}/$_fileSize',
             },
           ),
-          onSendProgress: (int sent, int total) {
-            print("sent: $sent, total: $total");
-          },
+          onSendProgress: onProgress,
         );
+        print('uploadVideoInChunks finalResponse $i $finalResponse');
       }
+
       if (finalResponse?.statusCode != 200 || finalResponse == null) {
         throw CloudinaryException(
           finalResponse?.data,
@@ -222,8 +220,6 @@ class CloudinaryPublic {
     return cloudinaryResponse;
   }
 
-
-  
   /// common function to generate form data
   /// Override the default upload preset (when [CloudinaryPublic] is instantiated) with this one (if specified).
   Map<String, dynamic> generateFormData(
@@ -251,5 +247,4 @@ class CloudinaryPublic {
 
     return data;
   }
-
 }

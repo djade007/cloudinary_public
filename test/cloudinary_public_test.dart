@@ -33,7 +33,6 @@ void main() {
     final cloudinary = CloudinaryPublic(
       cloudName,
       uploadPreset,
-      client: client,
       cache: true,
     );
 
@@ -60,7 +59,6 @@ void main() {
     final cloudinary = CloudinaryPublic(
       cloudName,
       uploadPreset,
-      client: client,
       cache: true,
     );
 
@@ -88,7 +86,6 @@ void main() {
     final cloudinary = CloudinaryPublic(
       cloudName,
       uploadPreset,
-      client: client,
       cache: true,
     );
 
@@ -113,7 +110,6 @@ void main() {
     final cloudinary = CloudinaryPublic(
       cloudName,
       uploadPreset,
-      client: client,
       cache: true,
     );
 
@@ -137,7 +133,6 @@ void main() {
     final cloudinary = CloudinaryPublic(
       cloudName,
       uploadPreset,
-      client: client,
       cache: true,
     );
 
@@ -161,7 +156,6 @@ void main() {
     final cloudinary = CloudinaryPublic(
       cloudName,
       uploadPreset,
-      client: client,
       cache: true,
     );
 
@@ -202,7 +196,6 @@ void main() {
     final cloudinary = CloudinaryPublic(
       cloudName,
       uploadPreset,
-      client: client,
       cache: true,
     );
 
