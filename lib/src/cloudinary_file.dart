@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:cloudinary_public/cloudinary_public.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
@@ -98,7 +101,7 @@ class CloudinaryFile {
   /// Instantiate [CloudinaryFile] from [ByteData]
   factory CloudinaryFile.fromBytesData(
     List<int> bytesData, {
-      String? publicId,
+    String? publicId,
     String? identifier,
     CloudinaryResourceType resourceType: CloudinaryResourceType.Auto,
     List<String>? tags,
@@ -155,23 +158,21 @@ class CloudinaryFile {
   }
 
   /// Convert [CloudinaryFile] to [MultipartFile]
-  Future<http.MultipartFile> toMultipartFile([String fieldName = 'file']) async {
+  Future<MultipartFile> toMultipartFile([String fieldName = 'file']) async {
     assert(
       !fromExternalUrl,
       'toMultipartFile() not available when uploading from external urls',
     );
 
     if (byteData != null) {
-      return http.MultipartFile.fromBytes(
-        fieldName,
+      return MultipartFile.fromBytes(
         byteData!.buffer.asUint8List(),
         filename: identifier,
       );
     }
 
     if (bytesData != null) {
-      return http.MultipartFile.fromBytes(
-        fieldName,
+      return MultipartFile.fromBytes(
         bytesData!,
         filename: identifier,
       );
@@ -179,16 +180,46 @@ class CloudinaryFile {
 
     if (kIsWeb) {
       final bytes = await http.readBytes(Uri.parse(filePath!));
-      return http.MultipartFile.fromBytes(
-        fieldName,
-        bytes,
+      return MultipartFile.fromBytes(
+        bytes.buffer.asUint8List(),
         filename: identifier,
       );
     }
 
-    return http.MultipartFile.fromPath(
-      fieldName,
+    return MultipartFile.fromFile(
       filePath!,
+      filename: identifier,
+    );
+  }
+
+  /// Convert to multipart with chunked upload
+  MultipartFile toMultipartFileChunked(
+    int start,
+    int end,
+  ) {
+    assert(
+      !fromExternalUrl,
+      'toMultipartFileChunked() not available when uploading from external urls',
+    );
+    Stream<List<int>> chunkStream;
+    if (byteData != null) {
+      chunkStream = Stream.fromIterable(
+        byteData!.buffer.asInt8List(start, end - start).map((e) => [e]),
+      );
+    } else if (bytesData != null) {
+      chunkStream = Stream.fromIterable(
+        bytesData!.map((e) => [e]),
+      );
+    } if(kIsWeb){
+      chunkStream = http.readBytes(Uri.parse(filePath!)).asStream();
+
+    } else {
+      chunkStream = File(filePath!).openRead(start, end);
+    }
+
+    return MultipartFile(
+      chunkStream,
+      end - start,
       filename: identifier,
     );
   }

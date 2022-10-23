@@ -161,7 +161,6 @@ class CloudinaryPublic {
     CloudinaryResponse? cloudinaryResponse;
     if (file.filePath == null) return null;
     final tempFile = File(file.filePath!);
-    final fileName = path.basename(file.filePath!);
 
     Response? finalResponse;
 
@@ -178,10 +177,9 @@ class CloudinaryPublic {
         print('uploadVideoInChunks chunk $i of $_chunksCount');
         final start = i * _maxChunkSize;
         final end = min((i + 1) * _maxChunkSize, _fileSize);
-        final chunkStream = tempFile.openRead(start, end);
 
         final formData = FormData.fromMap({
-          "file": MultipartFile(chunkStream, end - start, filename: fileName),
+          "file": file.toMultipartFileChunked(start, end),
           ...data
         });
 
