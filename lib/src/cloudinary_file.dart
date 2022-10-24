@@ -167,7 +167,7 @@ class CloudinaryFile {
 
     if (byteData != null) {
       return MultipartFile.fromBytes(
-        byteData!.buffer.asUint8List(),
+        byteData?.buffer.asUint8List()?? [],
         filename: identifier,
       );
     }
@@ -211,9 +211,9 @@ class CloudinaryFile {
       chunkStream = Stream.fromIterable(
         bytesData!.map((e) => [e]),
       );
-    } if(kIsWeb){
+    }
+    if (kIsWeb) {
       chunkStream = http.readBytes(Uri.parse(filePath!)).asStream();
-
     } else {
       chunkStream = File(filePath!).openRead(start, end);
     }
@@ -223,5 +223,31 @@ class CloudinaryFile {
       end - start,
       filename: identifier,
     );
+  }
+
+  /// common function to generate form data
+  /// Override the default upload preset (when [CloudinaryPublic] is instantiated) with this one (if specified).
+  Map<String, dynamic> toFormData({
+    required String uploadPreset,
+  }) {
+    final Map<String, dynamic> data = {
+      'upload_preset': uploadPreset,
+      if (publicId != null) 'public_id': publicId,
+      if (folder != null) 'folder': folder,
+      if (tags != null && tags!.isNotEmpty) 'tags': tags!.join(','),
+    };
+
+    if (context != null && context!.isNotEmpty) {
+      String context = '';
+
+      this.context!.forEach((key, value) {
+        context += '|$key=$value';
+      });
+
+      // remove the extra `|` at the beginning
+      data['context'] = context.replaceFirst('|', '');
+    }
+
+    return data;
   }
 }

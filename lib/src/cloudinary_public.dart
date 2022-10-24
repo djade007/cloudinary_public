@@ -46,9 +46,11 @@ class CloudinaryPublic {
   }
 
   String _createUrl(CloudinaryResourceType type) {
-    return '$_baseUrl/$_cloudName/'
+    var url =  '$_baseUrl/$_cloudName/'
         '${describeEnum(type).toLowerCase()}'
         '/upload';
+        print(url);
+    return url;
   }
 
   CloudinaryImage getImage(String publicId) {
@@ -82,7 +84,7 @@ class CloudinaryPublic {
     }
 
     Map<String, dynamic> data =
-        generateFormData(file, uploadPreset: uploadPreset);
+        file.toFormData(uploadPreset: uploadPreset ?? _uploadPreset);
 
     if (file.fromExternalUrl) {
       data[_fieldName] = file.url!;
@@ -167,7 +169,7 @@ class CloudinaryPublic {
     int _chunksCount = (_fileSize / _maxChunkSize).ceil();
 
     Map<String, dynamic> data =
-        generateFormData(file, uploadPreset: uploadPreset);
+        file.toFormData(uploadPreset: uploadPreset ?? _uploadPreset);
 
     try {
       for (int i = 0; i < _chunksCount; i++) {
@@ -214,37 +216,9 @@ class CloudinaryPublic {
         finalResponse.data,
       );
     } catch (e) {
-      print("CloudinaryService uploadVideo error: $e");
+      print("CloudinaryService uploadFileInChunks error: $e");
       throw e;
     }
     return cloudinaryResponse;
-  }
-
-  /// common function to generate form data
-  /// Override the default upload preset (when [CloudinaryPublic] is instantiated) with this one (if specified).
-  Map<String, dynamic> generateFormData(
-    CloudinaryFile file, {
-    String? uploadPreset,
-  }) {
-    final Map<String, dynamic> data = {
-      'upload_preset': uploadPreset ?? _uploadPreset,
-      if (file.publicId != null) 'public_id': file.publicId,
-      if (file.folder != null) 'folder': file.folder,
-      if (file.tags != null && file.tags!.isNotEmpty)
-        'tags': file.tags!.join(','),
-    };
-
-    if (file.context != null && file.context!.isNotEmpty) {
-      String context = '';
-
-      file.context!.forEach((key, value) {
-        context += '|$key=$value';
-      });
-
-      // remove the extra `|` at the beginning
-      data['context'] = context.replaceFirst('|', '');
-    }
-
-    return data;
   }
 }

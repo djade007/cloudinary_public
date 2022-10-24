@@ -137,8 +137,11 @@ void main() {
     );
 
     final files = <Future<CloudinaryFile>>[];
-    final file = CloudinaryFile.fromFutureByteData(Future.value(ByteData(8)),
-        resourceType: CloudinaryResourceType.Image, identifier: 'image.jpg');
+    final file = CloudinaryFile.fromFutureByteData(
+      Future.value(ByteData(8)),
+      resourceType: CloudinaryResourceType.Image,
+      identifier: 'image.jpg',
+    );
 
     files.add(file);
     files.add(file);
@@ -194,8 +197,8 @@ void main() {
 
   test('thumbnail shortcut', () {
     final cloudinary = CloudinaryPublic(
-      cloudName,
-      uploadPreset,
+      "demo",
+      "present",
       cache: true,
     );
 
