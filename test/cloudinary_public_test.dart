@@ -17,7 +17,7 @@ File getFile() {
   return file;
 }
 
-const cloudName = 'demo';
+const cloudName = 'name';
 const uploadPreset = 'preset';
 
 void main() {
