@@ -1,7 +1,7 @@
 import 'dart:async';
-import 'dart:io';
 import 'dart:math';
-import 'package:path/path.dart' as path;
+// ignore: unused_import
+import 'dart:typed_data';
 
 import 'package:cloudinary_public/cloudinary_public.dart';
 import 'package:dio/dio.dart';
@@ -46,10 +46,10 @@ class CloudinaryPublic {
   }
 
   String _createUrl(CloudinaryResourceType type) {
-    var url =  '$_baseUrl/$_cloudName/'
+    var url = '$_baseUrl/$_cloudName/'
         '${describeEnum(type).toLowerCase()}'
         '/upload';
-        print(url);
+    print(url);
     return url;
   }
 
@@ -156,13 +156,12 @@ class CloudinaryPublic {
     int chunkSize = 10000000, // 10MB
   }) async {
     CloudinaryResponse? cloudinaryResponse;
-    if (file.filePath == null) return null;
-    final tempFile = File(file.filePath!);
-    final fileName = path.basename(file.filePath!);
+
+    print("uploadFileInChunks: fileSize ${file.fileSize}");
 
     Response? finalResponse;
 
-    int _fileSize = tempFile.lengthSync(); // 100MB
+    int _fileSize = file.fileSize; // 100MB
 
     int _maxChunkSize = min(_fileSize, chunkSize);
 
@@ -170,16 +169,14 @@ class CloudinaryPublic {
 
     Map<String, dynamic> data =
         file.toFormData(uploadPreset: uploadPreset ?? _uploadPreset);
-
     try {
       for (int i = 0; i < _chunksCount; i++) {
         print('uploadVideoInChunks chunk $i of $_chunksCount');
         final start = i * _maxChunkSize;
         final end = min((i + 1) * _maxChunkSize, _fileSize);
-        final chunkStream = tempFile.openRead(start, end);
 
         final formData = FormData.fromMap({
-          "file": MultipartFile(chunkStream, end - start, filename: fileName),
+          "file": file.toMultipartFileChunked(start, end),
           ...data,
         });
 
@@ -194,7 +191,11 @@ class CloudinaryPublic {
               'Content-Range': 'bytes $start-${end - 1}/$_fileSize',
             },
           ),
-          onSendProgress: onProgress,
+          onSendProgress: (sent, total) {
+            // total progress
+            final s = sent + i * _maxChunkSize;
+            onProgress?.call(s, _fileSize);
+          },
         );
         print('uploadVideoInChunks finalResponse $i $finalResponse');
       }

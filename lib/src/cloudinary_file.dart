@@ -1,10 +1,10 @@
 import 'dart:io';
+// ignore: unnecessary_import
 import 'dart:typed_data';
 
 import 'package:cloudinary_public/cloudinary_public.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import 'package:http/http.dart' as http;
 
 /// The recognised file class to be used for this package
 class CloudinaryFile {
@@ -49,6 +49,18 @@ class CloudinaryFile {
 
   /// Determine if initialized from [CloudinaryFile.fromUrl]
   bool get fromExternalUrl => url != null;
+
+  int get fileSize {
+    if (byteData != null) {
+      return byteData!.lengthInBytes;
+    } else if (bytesData != null) {
+      return bytesData!.length;
+    } else if (filePath != null) {
+      return File(filePath!).lengthSync();
+    } else {
+      return 0;
+    }
+  }
 
   /// [CloudinaryFile] instance
   const CloudinaryFile._({
@@ -167,7 +179,7 @@ class CloudinaryFile {
 
     if (byteData != null) {
       return MultipartFile.fromBytes(
-        byteData?.buffer.asUint8List()?? [],
+        byteData?.buffer.asUint8List() ?? [],
         filename: identifier,
       );
     }
@@ -175,14 +187,6 @@ class CloudinaryFile {
     if (bytesData != null) {
       return MultipartFile.fromBytes(
         bytesData!,
-        filename: identifier,
-      );
-    }
-
-    if (kIsWeb) {
-      final bytes = await http.readBytes(Uri.parse(filePath!));
-      return MultipartFile.fromBytes(
-        bytes.buffer.asUint8List(),
         filename: identifier,
       );
     }
@@ -203,18 +207,19 @@ class CloudinaryFile {
       'toMultipartFileChunked() not available when uploading from external urls',
     );
     Stream<List<int>> chunkStream;
+
     if (byteData != null) {
+      print('toMultipartFileChunked byteData');
       chunkStream = Stream.fromIterable(
-        byteData!.buffer.asInt8List(start, end - start).map((e) => [e]),
+        [byteData!.buffer.asUint8List(start, end - start)],
       );
     } else if (bytesData != null) {
+      print('toMultipartFileChunked bytesData');
       chunkStream = Stream.fromIterable(
         bytesData!.map((e) => [e]),
       );
-    }
-    if (kIsWeb) {
-      chunkStream = http.readBytes(Uri.parse(filePath!)).asStream();
     } else {
+      print('toMultipartFileChunked filePath');
       chunkStream = File(filePath!).openRead(start, end);
     }
 

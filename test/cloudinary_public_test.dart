@@ -1,11 +1,8 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:cloudinary_public/cloudinary_public.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:http/http.dart' as http;
-import 'package:http/testing.dart';
 
 File getFile() {
   File file = File('../test/icon.png');
@@ -17,18 +14,17 @@ File getFile() {
   return file;
 }
 
+Future<ByteData> getFutureByteData() async {
+  final tempFile = getFile();
+  Uint8List uIntBytes = tempFile.readAsBytesSync();
+  ByteData bytes = (ByteData.view(uIntBytes.buffer));
+  return Future.value(bytes);
+}
+
 const cloudName = 'name';
 const uploadPreset = 'preset';
 
 void main() {
-  // mock http client
-  final client = MockClient(
-    (request) async => http.Response(
-      jsonEncode(_sampleResponse),
-      200,
-    ),
-  );
-
   test('uploads an image from external url', () async {
     final cloudinary = CloudinaryPublic(
       cloudName,
@@ -138,7 +134,7 @@ void main() {
 
     final files = <Future<CloudinaryFile>>[];
     final file = CloudinaryFile.fromFutureByteData(
-      Future.value(ByteData(8)),
+      getFutureByteData(),
       resourceType: CloudinaryResourceType.Image,
       identifier: 'image.jpg',
     );
