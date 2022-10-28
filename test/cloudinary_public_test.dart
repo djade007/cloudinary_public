@@ -1,28 +1,10 @@
-import 'dart:io';
-
 import 'package:cloudinary_public/cloudinary_public.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-File getFile() {
-  File file = File('../test/icon.png');
-  try {
-    file.lengthSync();
-  } catch (exception) {
-    file = File('test/icon.png');
-  }
-  return file;
-}
+import 'cloudinary_file_test.dart';
 
-Future<ByteData> getFutureByteData() async {
-  final tempFile = getFile();
-  Uint8List uIntBytes = tempFile.readAsBytesSync();
-  ByteData bytes = (ByteData.view(uIntBytes.buffer));
-  return Future.value(bytes);
-}
-
-const cloudName = 'name';
-const uploadPreset = 'preset';
+const cloudName = 'test';
+const uploadPreset = 'test';
 
 void main() {
   test('uploads an image from external url', () async {
@@ -204,33 +186,38 @@ void main() {
         'https://res.cloudinary.com/demo/image/upload/c_thumb,g_face,'
         'h_200,w_200/cloudinary_icon');
   });
-}
 
-const _sampleResponse = {
-  'asset_id': '82345c4e10d4c019658b3334cde497ed9',
-  'public_id': 'psryios0nkgpf1h4a3h',
-  'version': '1590212116',
-  'version_id': 'd5c175f90d3daf799cda96ead698368ea',
-  'signature': '08a8183b499d1cd3aa46ea54ab278c14b8cfbba',
-  'width': '1668',
-  'height': '2500',
-  'format': 'jpg',
-  'resource_type': 'image',
-  'created_at': '2020-05-23T05:35:16Z',
-  'tags': [],
-  'bytes': '3331383',
-  'type': 'upload',
-  'etag': '787996e313bcdd299d090b20389tta8d',
-  'placeholder': 'false',
-  'url':
-      'http://res.cloudinary.com/$cloudName/image/upload/v1590212116/psryios0nkgpf1h4um3h.jpg',
-  'secure_url':
-      'https://res.cloudinary.com/$cloudName/image/upload/v1590212116/psryios0nkgpf1h4um3h.jpg',
-  'original_filename': '001',
-  'context': {
-    'custom': {
-      'alt': 'image',
-      'caption': 'Example image',
-    }
-  }
-};
+  test("Upload file in Chunks", () async {
+    final cloudinary = CloudinaryPublic(
+      cloudName,
+      uploadPreset,
+      cache: true,
+    );
+    final videoFile = getVideoFile();
+
+    final file = CloudinaryFile.fromFile(
+      videoFile.path,
+      resourceType: CloudinaryResourceType.Video,
+      tags: ['trip'],
+    );
+    final res = await cloudinary.uploadFileInChunks(file);
+    expect(res, TypeMatcher<CloudinaryResponse>());
+  });
+
+  test("Upload file bytes in chunks", () async {
+    final cloudinary = CloudinaryPublic(
+      cloudName,
+      uploadPreset,
+      cache: true,
+    );
+    final videoBytes = getFutureVideoByteData();
+
+    final file = await CloudinaryFile.fromFutureByteData(
+      videoBytes,
+      resourceType: CloudinaryResourceType.Video,
+      identifier: 'video.mp4',
+    );
+    final res = await cloudinary.uploadFileInChunks(file);
+    expect(res, TypeMatcher<CloudinaryResponse>());
+  });
+}

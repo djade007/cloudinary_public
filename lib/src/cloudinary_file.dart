@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 // ignore: unnecessary_import
 import 'dart:typed_data';
 
@@ -21,7 +22,7 @@ class CloudinaryFile {
   final String? publicId;
 
   /// The file name/path
-  final String? identifier;
+  final String identifier;
 
   /// An optional folder name where the uploaded asset will be stored.
   /// The public ID will contain the full path of the uploaded asset,
@@ -69,7 +70,7 @@ class CloudinaryFile {
     this.bytesData,
     this.filePath,
     this.publicId,
-    this.identifier,
+    required this.identifier,
     this.url,
     this.tags,
     this.folder,
@@ -77,11 +78,13 @@ class CloudinaryFile {
   });
 
   /// Instantiate [CloudinaryFile] from future [ByteData]
-  static Future<CloudinaryFile> fromFutureByteData(Future<ByteData> byteData,
-          {String? publicId,
-          String? identifier,
-          CloudinaryResourceType resourceType: CloudinaryResourceType.Auto,
-          List<String>? tags}) async =>
+  static Future<CloudinaryFile> fromFutureByteData(
+    Future<ByteData> byteData, {
+    required String identifier,
+    String? publicId,
+    CloudinaryResourceType resourceType: CloudinaryResourceType.Auto,
+    List<String>? tags,
+  }) async =>
       CloudinaryFile.fromByteData(
         await byteData,
         publicId: publicId,
@@ -93,8 +96,8 @@ class CloudinaryFile {
   /// Instantiate [CloudinaryFile] from [ByteData]
   factory CloudinaryFile.fromByteData(
     ByteData byteData, {
+    required String identifier,
     String? publicId,
-    String? identifier,
     CloudinaryResourceType resourceType: CloudinaryResourceType.Auto,
     List<String>? tags,
     String? folder,
@@ -114,8 +117,8 @@ class CloudinaryFile {
   /// Instantiate [CloudinaryFile] from [ByteData]
   factory CloudinaryFile.fromBytesData(
     List<int> bytesData, {
+    required String identifier,
     String? publicId,
-    String? identifier,
     CloudinaryResourceType resourceType: CloudinaryResourceType.Auto,
     List<String>? tags,
     String? folder,
@@ -216,7 +219,7 @@ class CloudinaryFile {
     } else if (bytesData != null) {
       print('toMultipartFileChunked bytesData');
       chunkStream = Stream.fromIterable(
-        bytesData!.map((e) => [e]),
+        [bytesData!.sublist(start, end)],
       );
     } else {
       print('toMultipartFileChunked filePath');
@@ -254,5 +257,22 @@ class CloudinaryFile {
     }
 
     return data;
+  }
+
+  List<MultipartFile> createChunks(
+    int _chunksCount,
+    int _maxChunkSize,
+  ) {
+    List<MultipartFile> _chunks = [];
+
+    for (int i = 0; i < _chunksCount; i++) {
+      int _start = i * _maxChunkSize;
+      int _end = min(fileSize, _start + _maxChunkSize);
+      _chunks.add(toMultipartFileChunked(
+        _start,
+        _end,
+      ));
+    }
+    return _chunks;
   }
 }

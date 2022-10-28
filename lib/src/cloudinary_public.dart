@@ -77,8 +77,6 @@ class CloudinaryPublic {
     Function(int, int)? onProgress,
   }) async {
     if (cache) {
-      assert(file.identifier != null, 'identifier is required for caching');
-
       if (_uploadedFiles.containsKey(file.identifier))
         return _uploadedFiles[file.identifier]!.enableCache();
     }
@@ -161,11 +159,12 @@ class CloudinaryPublic {
 
     Response? finalResponse;
 
-    int _fileSize = file.fileSize; // 100MB
+    int _maxChunkSize = min(file.fileSize, chunkSize);
 
-    int _maxChunkSize = min(_fileSize, chunkSize);
+    int _chunksCount = (file.fileSize / _maxChunkSize).ceil();
 
-    int _chunksCount = (_fileSize / _maxChunkSize).ceil();
+    List<MultipartFile>? _chunks =
+        file.createChunks(_chunksCount, _maxChunkSize);
 
     Map<String, dynamic> data =
         file.toFormData(uploadPreset: uploadPreset ?? _uploadPreset);
@@ -173,10 +172,10 @@ class CloudinaryPublic {
       for (int i = 0; i < _chunksCount; i++) {
         print('uploadVideoInChunks chunk $i of $_chunksCount');
         final start = i * _maxChunkSize;
-        final end = min((i + 1) * _maxChunkSize, _fileSize);
+        final end = min((i + 1) * _maxChunkSize, file.fileSize);
 
         final formData = FormData.fromMap({
-          "file": file.toMultipartFileChunked(start, end),
+          "file": _chunks[i],
           ...data,
         });
 
@@ -187,14 +186,14 @@ class CloudinaryPublic {
             headers: {
               'Accept': 'application/json',
               'Content-Type': 'multipart/form-data',
-              "X-Unique-Upload-Id": file.filePath,
-              'Content-Range': 'bytes $start-${end - 1}/$_fileSize',
+              "X-Unique-Upload-Id": file.identifier,
+              'Content-Range': 'bytes $start-${end - 1}/${file.fileSize}',
             },
           ),
           onSendProgress: (sent, total) {
             // total progress
             final s = sent + i * _maxChunkSize;
-            onProgress?.call(s, _fileSize);
+            onProgress?.call(s, file.fileSize);
           },
         );
         print('uploadVideoInChunks finalResponse $i $finalResponse');
