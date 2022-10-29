@@ -146,13 +146,26 @@ class CloudinaryPublic {
   }
 
   /// Upload file in chunks
-  /// default chunk size is 10 MB
+  /// default chunk size is 20 MB
+  /// chunk size must be less than 20 MB and greater than 5 MB
   Future<CloudinaryResponse?> uploadFileInChunks(
     CloudinaryFile file, {
     String? uploadPreset,
     Function(int, int)? onProgress,
-    int chunkSize = 10000000, // 10MB
+    int chunkSize = 20000000, // 20MB
   }) async {
+    if (chunkSize > 20000000 || chunkSize < 5000000) {
+      throw CloudinaryException(
+        'Chunk size must be less than 20 MB and greater than 5 MB',
+        0,
+        request: {
+          'url': file.url,
+          'path': file.filePath,
+          'public_id': file.identifier,
+          'identifier': file.identifier,
+        },
+      );
+    }
     CloudinaryResponse? cloudinaryResponse;
 
     print("uploadFileInChunks: fileSize ${file.fileSize}");
