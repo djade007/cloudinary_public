@@ -8,7 +8,7 @@ secretKey.
 
 ## Getting started
 
-Add the dependency `cloudinary_public: ^0.13.0` to your project:
+Add the dependency `cloudinary_public: ^0.20.0` to your project:
 
 ```dart
 import 'package:cloudinary_public/cloudinary_public.dart';
@@ -103,6 +103,32 @@ final res = await cloudinary.uploadFile(
       'caption': 'An example image',
     },
   ),
+  onProgress: (count, total) {
+    setState(() {
+      _uploadingPercentage = (count / total) * 100;
+    });
+  },
+);
+```
+
+## Upload In Chunks
+Use chunked upload when file size is more then 100 Megabytes.
+
+By default, the chunk size is set to 20 Megabytes but can be set to as low as 5 Megabytes by using the chunk_size parameter.
+
+Source: https://cloudinary.com/documentation/upload_images#chunked_asset_upload
+
+```dart
+final res = await cloudinary.uploadFileInChunks(
+  CloudinaryFile.fromFile(
+    _pickedFile.path,
+    folder: 'hello-folder',
+    context: {
+      'alt': 'Hello',
+      'caption': 'An example upload in chunks',
+    },
+  ),
+  chunkSize: 10000000
   onProgress: (count, total) {
     setState(() {
       _uploadingPercentage = (count / total) * 100;
