@@ -74,7 +74,7 @@ class CloudinaryPublic {
   Future<CloudinaryResponse> uploadFile(
     CloudinaryFile file, {
     String? uploadPreset,
-    Function(int, int)? onProgress,
+    ProgressCallback? onProgress,
   }) async {
     if (cache) {
       if (_uploadedFiles.containsKey(file.identifier))
@@ -124,7 +124,7 @@ class CloudinaryPublic {
   Future<CloudinaryResponse> uploadFutureFile(
     Future<CloudinaryFile> file, {
     String? uploadPreset,
-    Function(int, int)? onProgress,
+    ProgressCallback? onProgress,
   }) async {
     return uploadFile(
       await file,
@@ -137,10 +137,21 @@ class CloudinaryPublic {
   Future<List<CloudinaryResponse>> multiUpload(
     List<Future<CloudinaryFile>> files, {
     String? uploadPreset,
+    ProgressCallback? onProgress,
+    void Function(int index)? currentUploadIndex,
   }) async {
     return Future.wait(
       files.map(
-        (file) => uploadFutureFile(file, uploadPreset: uploadPreset),
+        (file) {
+          if (currentUploadIndex != null) {
+            currentUploadIndex(files.indexOf(file));
+          }
+          return uploadFutureFile(
+            file,
+            uploadPreset: uploadPreset,
+            onProgress: onProgress,
+          );
+        },
       ),
     );
   }
@@ -151,7 +162,7 @@ class CloudinaryPublic {
   Future<CloudinaryResponse?> uploadFileInChunks(
     CloudinaryFile file, {
     String? uploadPreset,
-    Function(int, int)? onProgress,
+    ProgressCallback? onProgress,
     int chunkSize = 20000000, // 20MB
   }) async {
     if (chunkSize > 20000000 || chunkSize < 5000000) {
