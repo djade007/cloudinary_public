@@ -194,6 +194,17 @@ class CloudinaryFile {
       );
     }
 
+    if (kIsWeb) {
+      final res = await Dio().get<List<int>>(
+        filePath!,
+        options: Options(responseType: ResponseType.bytes),
+      );
+      return MultipartFile.fromBytes(
+        res.data!,
+        filename: identifier,
+      );
+    }
+
     return MultipartFile.fromFile(
       filePath!,
       filename: identifier,

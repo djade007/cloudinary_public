@@ -1,3 +1,7 @@
+## 0.20.0
+- Upload large files in chunks support
+- Switch from http package to Dio to support chunk upload
+
 ## 0.13.0
 - add public_id option
 
