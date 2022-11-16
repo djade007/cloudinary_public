@@ -9,6 +9,7 @@ class CloudinaryResponse {
   final List<String> tags;
   final Map<String, dynamic> context;
   final bool fromCache;
+  final Map<String, dynamic> data;
 
   /// Extract and return the image context
   Map<String, String> get customContext {
@@ -24,6 +25,7 @@ class CloudinaryResponse {
     required this.url,
     required this.secureUrl,
     required this.originalFilename,
+    required this.data,
     this.tags: const [],
     this.context: const {},
     this.fromCache: false,
@@ -42,6 +44,7 @@ class CloudinaryResponse {
           ? (data['tags'] as List).map((tag) => tag as String).toList()
           : [],
       context: data['context'] is Map ? data['context'] : {},
+      data: data,
     );
   }
 
@@ -57,6 +60,7 @@ class CloudinaryResponse {
       tags: tags,
       context: context,
       fromCache: true,
+      data: data,
     );
   }
 
@@ -71,6 +75,7 @@ class CloudinaryResponse {
       'original_filename': originalFilename,
       'tags': tags,
       'context': context,
+      'data': data,
     };
   }
 

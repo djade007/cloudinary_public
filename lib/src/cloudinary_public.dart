@@ -1,12 +1,11 @@
 import 'dart:async';
-import 'dart:convert';
+import 'dart:math';
+// ignore: unused_import
+import 'dart:typed_data';
 
 import 'package:cloudinary_public/cloudinary_public.dart';
-import 'package:cloudinary_public/src/progress_callback.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import 'package:http/http.dart' as http;
-
-import 'multipart_request.dart';
 
 /// The base class for this package
 class CloudinaryPublic {
@@ -19,6 +18,8 @@ class CloudinaryPublic {
   /// To cache all the uploaded files in the current class instance
   Map<String?, CloudinaryResponse> _uploadedFiles = {};
 
+  static Dio _dio = Dio();
+
   /// Cloud name from Cloudinary
   final String _cloudName;
 
@@ -28,17 +29,27 @@ class CloudinaryPublic {
   /// Defaults to false
   final bool cache;
 
-  /// The http client to be used to upload files
-  http.Client? client;
-
   CloudinaryPublic(
     this._cloudName,
     this._uploadPreset, {
     this.cache = false,
-    this.client,
   }) {
-    /// set default http client
-    client ??= http.Client();
+    _dio = Dio(
+      BaseOptions(
+        baseUrl: _baseUrl,
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'multipart/form-data'
+        },
+      ),
+    );
+  }
+
+  String _createUrl(CloudinaryResourceType type) {
+    var url = '$_baseUrl/$_cloudName/'
+        '${describeEnum(type).toLowerCase()}'
+        '/upload';
+    return url;
   }
 
   CloudinaryImage getImage(String publicId) {
@@ -65,73 +76,29 @@ class CloudinaryPublic {
     ProgressCallback? onProgress,
   }) async {
     if (cache) {
-      assert(file.identifier != null, 'identifier is required for caching');
-
       if (_uploadedFiles.containsKey(file.identifier))
         return _uploadedFiles[file.identifier]!.enableCache();
     }
 
-    final url = '$_baseUrl/$_cloudName/'
-        '${describeEnum(file.resourceType).toLowerCase()}'
-        '/upload';
-
-    final request = MultipartRequest(
-      'POST',
-      Uri.parse(url),
-      onProgress: (count, total) {
-        onProgress?.call(count, total);
-      },
-    );
-
-    request.headers.addAll({
-      'Accept': 'application/json',
-    });
-
-    final data = {
-      'upload_preset': uploadPreset ?? _uploadPreset,
-    };
+    Map<String, dynamic> data =
+        file.toFormData(uploadPreset: uploadPreset ?? _uploadPreset);
 
     if (file.fromExternalUrl) {
       data[_fieldName] = file.url!;
     } else {
-      request.files.add(
-        await file.toMultipartFile(_fieldName),
-      );
+      data[_fieldName] = await file.toMultipartFile(_fieldName);
     }
 
-    if (file.publicId != null) {
-      data['public_id'] = file.publicId!;
-    }
+    var response = await _dio.post(
+      _createUrl(file.resourceType),
+      data: FormData.fromMap(data),
+      onSendProgress: onProgress,
+    );
 
-    if (file.folder != null) {
-      data['folder'] = file.folder!;
-    }
-
-    if (file.tags != null && file.tags!.isNotEmpty) {
-      data['tags'] = file.tags!.join(',');
-    }
-
-    if (file.context != null && file.context!.isNotEmpty) {
-      String context = '';
-
-      file.context!.forEach((key, value) {
-        context += '|$key=$value';
-      });
-
-      // remove the extra `|` at the beginning
-      data['context'] = context.replaceFirst('|', '');
-    }
-
-    request.fields.addAll(data);
-
-    final sendRequest = await client!.send(request);
-
-    final res = await http.Response.fromStream(sendRequest);
-
-    if (res.statusCode != 200) {
+    if (response.statusCode != 200) {
       throw CloudinaryException(
-        res.body,
-        res.statusCode,
+        response.data,
+        response.statusCode ?? 0,
         request: {
           'url': file.url,
           'path': file.filePath,
@@ -142,7 +109,7 @@ class CloudinaryPublic {
     }
 
     final cloudinaryResponse = CloudinaryResponse.fromMap(
-      json.decode(res.body),
+      response.data,
     );
 
     if (cache) {
@@ -169,11 +136,107 @@ class CloudinaryPublic {
   Future<List<CloudinaryResponse>> multiUpload(
     List<Future<CloudinaryFile>> files, {
     String? uploadPreset,
+    ProgressCallback? onProgress,
+    void Function(int index)? currentUploadIndex,
   }) async {
     return Future.wait(
       files.map(
-        (file) => uploadFutureFile(file, uploadPreset: uploadPreset),
+        (file) {
+          if (currentUploadIndex != null) {
+            currentUploadIndex(files.indexOf(file));
+          }
+          return uploadFutureFile(
+            file,
+            uploadPreset: uploadPreset,
+            onProgress: onProgress,
+          );
+        },
       ),
     );
+  }
+
+  /// Upload file in chunks
+  /// default chunk size is 20 MB
+  /// chunk size must be less than 20 MB and greater than 5 MB
+  Future<CloudinaryResponse?> uploadFileInChunks(
+    CloudinaryFile file, {
+    String? uploadPreset,
+    ProgressCallback? onProgress,
+    int chunkSize = 20000000, // 20MB
+  }) async {
+    if (chunkSize > 20000000 || chunkSize < 5000000) {
+      throw CloudinaryException(
+        'Chunk size must be less than 20 MB and greater than 5 MB',
+        0,
+        request: {
+          'url': file.url,
+          'path': file.filePath,
+          'public_id': file.identifier,
+          'identifier': file.identifier,
+        },
+      );
+    }
+    CloudinaryResponse? cloudinaryResponse;
+
+    Response? finalResponse;
+
+    int _maxChunkSize = min(file.fileSize, chunkSize);
+
+    int _chunksCount = (file.fileSize / _maxChunkSize).ceil();
+
+    List<MultipartFile>? _chunks =
+        file.createChunks(_chunksCount, _maxChunkSize);
+
+    Map<String, dynamic> data =
+        file.toFormData(uploadPreset: uploadPreset ?? _uploadPreset);
+    try {
+      for (int i = 0; i < _chunksCount; i++) {
+        final start = i * _maxChunkSize;
+        final end = min((i + 1) * _maxChunkSize, file.fileSize);
+
+        final formData = FormData.fromMap({
+          "file": _chunks[i],
+          ...data,
+        });
+
+        finalResponse = await _dio.post(
+          _createUrl(file.resourceType),
+          data: formData,
+          options: Options(
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'multipart/form-data',
+              "X-Unique-Upload-Id": file.identifier,
+              'Content-Range': 'bytes $start-${end - 1}/${file.fileSize}',
+            },
+          ),
+          onSendProgress: (sent, total) {
+            // total progress
+            final s = sent + i * _maxChunkSize;
+            onProgress?.call(s, file.fileSize);
+          },
+        );
+      }
+
+      if (finalResponse?.statusCode != 200 || finalResponse == null) {
+        throw CloudinaryException(
+          finalResponse?.data,
+          finalResponse?.statusCode ?? 0,
+          request: {
+            'url': file.url,
+            'path': file.filePath,
+            'public_id': file.identifier,
+            'identifier': file.identifier,
+          },
+        );
+      }
+
+      cloudinaryResponse = CloudinaryResponse.fromMap(
+        finalResponse.data,
+      );
+    } catch (e) {
+      throw e;
+    }
+    return cloudinaryResponse;
   }
 }

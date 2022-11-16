@@ -1,6 +1,11 @@
+import 'dart:io';
+import 'dart:math';
+// ignore: unnecessary_import
+import 'dart:typed_data';
+
 import 'package:cloudinary_public/cloudinary_public.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import 'package:http/http.dart' as http;
 
 /// The recognised file class to be used for this package
 class CloudinaryFile {
@@ -17,7 +22,7 @@ class CloudinaryFile {
   final String? publicId;
 
   /// The file name/path
-  final String? identifier;
+  final String identifier;
 
   /// An optional folder name where the uploaded asset will be stored.
   /// The public ID will contain the full path of the uploaded asset,
@@ -46,6 +51,18 @@ class CloudinaryFile {
   /// Determine if initialized from [CloudinaryFile.fromUrl]
   bool get fromExternalUrl => url != null;
 
+  int get fileSize {
+    if (byteData != null) {
+      return byteData!.lengthInBytes;
+    } else if (bytesData != null) {
+      return bytesData!.length;
+    } else if (filePath != null) {
+      return File(filePath!).lengthSync();
+    } else {
+      return 0;
+    }
+  }
+
   /// [CloudinaryFile] instance
   const CloudinaryFile._({
     this.resourceType: CloudinaryResourceType.Auto,
@@ -53,7 +70,7 @@ class CloudinaryFile {
     this.bytesData,
     this.filePath,
     this.publicId,
-    this.identifier,
+    required this.identifier,
     this.url,
     this.tags,
     this.folder,
@@ -61,11 +78,13 @@ class CloudinaryFile {
   });
 
   /// Instantiate [CloudinaryFile] from future [ByteData]
-  static Future<CloudinaryFile> fromFutureByteData(Future<ByteData> byteData,
-          {String? publicId,
-          String? identifier,
-          CloudinaryResourceType resourceType: CloudinaryResourceType.Auto,
-          List<String>? tags}) async =>
+  static Future<CloudinaryFile> fromFutureByteData(
+    Future<ByteData> byteData, {
+    required String identifier,
+    String? publicId,
+    CloudinaryResourceType resourceType: CloudinaryResourceType.Auto,
+    List<String>? tags,
+  }) async =>
       CloudinaryFile.fromByteData(
         await byteData,
         publicId: publicId,
@@ -77,8 +96,8 @@ class CloudinaryFile {
   /// Instantiate [CloudinaryFile] from [ByteData]
   factory CloudinaryFile.fromByteData(
     ByteData byteData, {
+    required String identifier,
     String? publicId,
-    String? identifier,
     CloudinaryResourceType resourceType: CloudinaryResourceType.Auto,
     List<String>? tags,
     String? folder,
@@ -98,8 +117,8 @@ class CloudinaryFile {
   /// Instantiate [CloudinaryFile] from [ByteData]
   factory CloudinaryFile.fromBytesData(
     List<int> bytesData, {
-      String? publicId,
-    String? identifier,
+    required String identifier,
+    String? publicId,
     CloudinaryResourceType resourceType: CloudinaryResourceType.Auto,
     List<String>? tags,
     String? folder,
@@ -155,41 +174,102 @@ class CloudinaryFile {
   }
 
   /// Convert [CloudinaryFile] to [MultipartFile]
-  Future<http.MultipartFile> toMultipartFile([String fieldName = 'file']) async {
+  Future<MultipartFile> toMultipartFile([String fieldName = 'file']) async {
     assert(
       !fromExternalUrl,
       'toMultipartFile() not available when uploading from external urls',
     );
 
     if (byteData != null) {
-      return http.MultipartFile.fromBytes(
-        fieldName,
-        byteData!.buffer.asUint8List(),
+      return MultipartFile.fromBytes(
+        byteData?.buffer.asUint8List() ?? [],
         filename: identifier,
       );
     }
 
     if (bytesData != null) {
-      return http.MultipartFile.fromBytes(
-        fieldName,
+      return MultipartFile.fromBytes(
         bytesData!,
         filename: identifier,
       );
     }
 
-    if (kIsWeb) {
-      final bytes = await http.readBytes(Uri.parse(filePath!));
-      return http.MultipartFile.fromBytes(
-        fieldName,
-        bytes,
-        filename: identifier,
-      );
-    }
-
-    return http.MultipartFile.fromPath(
-      fieldName,
+    return MultipartFile.fromFile(
       filePath!,
       filename: identifier,
     );
+  }
+
+  /// Convert to multipart with chunked upload
+  MultipartFile toMultipartFileChunked(
+    int start,
+    int end,
+  ) {
+    assert(
+      !fromExternalUrl,
+      'toMultipartFileChunked() not available when uploading from external urls',
+    );
+    Stream<List<int>> chunkStream;
+
+    if (byteData != null) {
+      chunkStream = Stream.fromIterable(
+        [byteData!.buffer.asUint8List(start, end - start)],
+      );
+    } else if (bytesData != null) {
+      chunkStream = Stream.fromIterable(
+        [bytesData!.sublist(start, end)],
+      );
+    } else {
+      chunkStream = File(filePath!).openRead(start, end);
+    }
+
+    return MultipartFile(
+      chunkStream,
+      end - start,
+      filename: identifier,
+    );
+  }
+
+  /// common function to generate form data
+  /// Override the default upload preset (when [CloudinaryPublic] is instantiated) with this one (if specified).
+  Map<String, dynamic> toFormData({
+    required String uploadPreset,
+  }) {
+    final Map<String, dynamic> data = {
+      'upload_preset': uploadPreset,
+      if (publicId != null) 'public_id': publicId,
+      if (folder != null) 'folder': folder,
+      if (tags != null && tags!.isNotEmpty) 'tags': tags!.join(','),
+    };
+
+    if (context != null && context!.isNotEmpty) {
+      String context = '';
+
+      this.context!.forEach((key, value) {
+        context += '|$key=$value';
+      });
+
+      // remove the extra `|` at the beginning
+      data['context'] = context.replaceFirst('|', '');
+    }
+
+    return data;
+  }
+
+  List<MultipartFile> createChunks(
+    int _chunksCount,
+    int _maxChunkSize,
+  ) {
+    List<MultipartFile> _chunks = [];
+
+    for (int i = 0; i < _chunksCount; i++) {
+      int _start = i * _maxChunkSize;
+      int _end = min(fileSize, _start + _maxChunkSize);
+      _chunks.add(toMultipartFileChunked(
+        _start,
+        _end,
+      ));
+    }
+    return _chunks;
   }
 }

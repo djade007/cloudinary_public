@@ -104,7 +104,7 @@ class _MultiImagePickerExampleState extends State<MultiImagePickerExample> {
           .map(
             (image) => CloudinaryFile.fromFutureByteData(
               image.getByteData(),
-              identifier: image.identifier,
+              identifier: image.identifier ?? "test",
             ),
           )
           .toList(),
