@@ -49,7 +49,6 @@ class CloudinaryPublic {
     var url = '$_baseUrl/$_cloudName/'
         '${describeEnum(type).toLowerCase()}'
         '/upload';
-    print(url);
     return url;
   }
 
@@ -179,8 +178,6 @@ class CloudinaryPublic {
     }
     CloudinaryResponse? cloudinaryResponse;
 
-    print("uploadFileInChunks: fileSize ${file.fileSize}");
-
     Response? finalResponse;
 
     int _maxChunkSize = min(file.fileSize, chunkSize);
@@ -194,7 +191,6 @@ class CloudinaryPublic {
         file.toFormData(uploadPreset: uploadPreset ?? _uploadPreset);
     try {
       for (int i = 0; i < _chunksCount; i++) {
-        print('uploadVideoInChunks chunk $i of $_chunksCount');
         final start = i * _maxChunkSize;
         final end = min((i + 1) * _maxChunkSize, file.fileSize);
 
@@ -220,7 +216,6 @@ class CloudinaryPublic {
             onProgress?.call(s, file.fileSize);
           },
         );
-        print('uploadVideoInChunks finalResponse $i $finalResponse');
       }
 
       if (finalResponse?.statusCode != 200 || finalResponse == null) {
@@ -240,7 +235,6 @@ class CloudinaryPublic {
         finalResponse.data,
       );
     } catch (e) {
-      print("CloudinaryService uploadFileInChunks error: $e");
       throw e;
     }
     return cloudinaryResponse;

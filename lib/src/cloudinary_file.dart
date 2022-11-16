@@ -212,17 +212,14 @@ class CloudinaryFile {
     Stream<List<int>> chunkStream;
 
     if (byteData != null) {
-      print('toMultipartFileChunked byteData');
       chunkStream = Stream.fromIterable(
         [byteData!.buffer.asUint8List(start, end - start)],
       );
     } else if (bytesData != null) {
-      print('toMultipartFileChunked bytesData');
       chunkStream = Stream.fromIterable(
         [bytesData!.sublist(start, end)],
       );
     } else {
-      print('toMultipartFileChunked filePath');
       chunkStream = File(filePath!).openRead(start, end);
     }
 
