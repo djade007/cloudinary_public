@@ -16,7 +16,9 @@ class CloudinaryException implements Exception {
   /// Extract the error message from cloudinary
   String? get message {
     try {
-      return jsonDecode(responseString)['error']['message'];
+      final Map<String, dynamic> json = jsonDecode(responseString);
+      final Map<String, dynamic> error = json['error'];
+      return error['message'];
     } catch (e) {
       // unable to extract error message
       return null;
@@ -27,6 +29,7 @@ class CloudinaryException implements Exception {
   CloudinaryException(this.responseString, this.statusCode, {this.request});
 
   /// `CloudinaryException` summary
+  @override
   String toString() {
     return '($statusCode) ${message ?? responseString}';
   }

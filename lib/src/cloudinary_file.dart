@@ -65,7 +65,7 @@ class CloudinaryFile {
 
   /// [CloudinaryFile] instance
   const CloudinaryFile._({
-    this.resourceType: CloudinaryResourceType.Auto,
+    this.resourceType = CloudinaryResourceType.Auto,
     this.byteData,
     this.bytesData,
     this.filePath,
@@ -82,7 +82,7 @@ class CloudinaryFile {
     Future<ByteData> byteData, {
     required String identifier,
     String? publicId,
-    CloudinaryResourceType resourceType: CloudinaryResourceType.Auto,
+    CloudinaryResourceType resourceType = CloudinaryResourceType.Auto,
     List<String>? tags,
   }) async =>
       CloudinaryFile.fromByteData(
@@ -98,7 +98,7 @@ class CloudinaryFile {
     ByteData byteData, {
     required String identifier,
     String? publicId,
-    CloudinaryResourceType resourceType: CloudinaryResourceType.Auto,
+    CloudinaryResourceType resourceType = CloudinaryResourceType.Auto,
     List<String>? tags,
     String? folder,
     Map<String, dynamic>? context,
@@ -119,7 +119,7 @@ class CloudinaryFile {
     List<int> bytesData, {
     required String identifier,
     String? publicId,
-    CloudinaryResourceType resourceType: CloudinaryResourceType.Auto,
+    CloudinaryResourceType resourceType = CloudinaryResourceType.Auto,
     List<String>? tags,
     String? folder,
     Map<String, dynamic>? context,
@@ -140,7 +140,7 @@ class CloudinaryFile {
     String path, {
     String? publicId,
     String? identifier,
-    CloudinaryResourceType resourceType: CloudinaryResourceType.Auto,
+    CloudinaryResourceType resourceType = CloudinaryResourceType.Auto,
     List<String>? tags,
     String? folder,
     Map<String, dynamic>? context,
@@ -159,7 +159,7 @@ class CloudinaryFile {
   /// Instantiate [CloudinaryFile] from an external url
   factory CloudinaryFile.fromUrl(
     String url, {
-    CloudinaryResourceType resourceType: CloudinaryResourceType.Auto,
+    CloudinaryResourceType resourceType = CloudinaryResourceType.Auto,
     List<String>? tags,
     String? folder,
     Map<String, dynamic>? context,
@@ -174,7 +174,7 @@ class CloudinaryFile {
   }
 
   /// Convert [CloudinaryFile] to [MultipartFile]
-  Future<MultipartFile> toMultipartFile([String fieldName = 'file']) async {
+  Future<MultipartFile> toMultipartFile() async {
     assert(
       !fromExternalUrl,
       'toMultipartFile() not available when uploading from external urls',
@@ -257,19 +257,21 @@ class CloudinaryFile {
   }
 
   List<MultipartFile> createChunks(
-    int _chunksCount,
-    int _maxChunkSize,
+    int chunksCount,
+    int maxChunkSize,
   ) {
-    List<MultipartFile> _chunks = [];
+    List<MultipartFile> chunks = [];
 
-    for (int i = 0; i < _chunksCount; i++) {
-      int _start = i * _maxChunkSize;
-      int _end = min(fileSize, _start + _maxChunkSize);
-      _chunks.add(toMultipartFileChunked(
-        _start,
-        _end,
-      ));
+    for (int i = 0; i < chunksCount; i++) {
+      int start = i * maxChunkSize;
+      int end = min(fileSize, start + maxChunkSize);
+      chunks.add(
+        toMultipartFileChunked(
+          start,
+          end,
+        ),
+      );
     }
-    return _chunks;
+    return chunks;
   }
 }

@@ -16,9 +16,13 @@ class CloudinaryPublic {
   static const _fieldName = 'file';
 
   /// To cache all the uploaded files in the current class instance
-  Map<String?, CloudinaryResponse> _uploadedFiles = {};
+  final Map<String?, CloudinaryResponse> _uploadedFiles = {};
 
-  static Dio _dio = Dio();
+  /// The provided Dio client to be used to upload files
+  final Dio? dioClient;
+
+  /// The Dio client to be used to upload files
+  final Dio _dioClient;
 
   /// Cloud name from Cloudinary
   final String _cloudName;
@@ -33,17 +37,8 @@ class CloudinaryPublic {
     this._cloudName,
     this._uploadPreset, {
     this.cache = false,
-  }) {
-    _dio = Dio(
-      BaseOptions(
-        baseUrl: _baseUrl,
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'multipart/form-data'
-        },
-      ),
-    );
-  }
+    this.dioClient,
+  }) : _dioClient = dioClient ?? Dio();
 
   String _createUrl(CloudinaryResourceType type) {
     var url = '$_baseUrl/$_cloudName/'
@@ -76,8 +71,9 @@ class CloudinaryPublic {
     ProgressCallback? onProgress,
   }) async {
     if (cache) {
-      if (_uploadedFiles.containsKey(file.identifier))
+      if (_uploadedFiles.containsKey(file.identifier)) {
         return _uploadedFiles[file.identifier]!.enableCache();
+      }
     }
 
     Map<String, dynamic> data =
@@ -86,10 +82,10 @@ class CloudinaryPublic {
     if (file.fromExternalUrl) {
       data[_fieldName] = file.url!;
     } else {
-      data[_fieldName] = await file.toMultipartFile(_fieldName);
+      data[_fieldName] = await file.toMultipartFile();
     }
 
-    var response = await _dio.post(
+    var response = await _dioClient.post(
       _createUrl(file.resourceType),
       data: FormData.fromMap(data),
       onSendProgress: onProgress,
@@ -180,39 +176,40 @@ class CloudinaryPublic {
 
     Response? finalResponse;
 
-    int _maxChunkSize = min(file.fileSize, chunkSize);
+    int maxChunkSize = min(file.fileSize, chunkSize);
 
-    int _chunksCount = (file.fileSize / _maxChunkSize).ceil();
+    int chunksCount = (file.fileSize / maxChunkSize).ceil();
 
-    List<MultipartFile>? _chunks =
-        file.createChunks(_chunksCount, _maxChunkSize);
+    List<MultipartFile>? chunks = file.createChunks(chunksCount, maxChunkSize);
 
-    Map<String, dynamic> data =
-        file.toFormData(uploadPreset: uploadPreset ?? _uploadPreset);
+    Map<String, dynamic> data = file.toFormData(
+      uploadPreset: uploadPreset ?? _uploadPreset,
+    );
+
     try {
-      for (int i = 0; i < _chunksCount; i++) {
-        final start = i * _maxChunkSize;
-        final end = min((i + 1) * _maxChunkSize, file.fileSize);
+      for (int i = 0; i < chunksCount; i++) {
+        final start = i * maxChunkSize;
+        final end = min((i + 1) * maxChunkSize, file.fileSize);
 
         final formData = FormData.fromMap({
-          "file": _chunks[i],
+          'file': chunks[i],
           ...data,
         });
 
-        finalResponse = await _dio.post(
+        finalResponse = await _dioClient.post(
           _createUrl(file.resourceType),
           data: formData,
           options: Options(
             headers: {
               'Accept': 'application/json',
               'Content-Type': 'multipart/form-data',
-              "X-Unique-Upload-Id": file.identifier,
+              'X-Unique-Upload-Id': file.identifier,
               'Content-Range': 'bytes $start-${end - 1}/${file.fileSize}',
             },
           ),
           onSendProgress: (sent, total) {
             // total progress
-            final s = sent + i * _maxChunkSize;
+            final s = sent + i * maxChunkSize;
             onProgress?.call(s, file.fileSize);
           },
         );
@@ -235,7 +232,7 @@ class CloudinaryPublic {
         finalResponse.data,
       );
     } catch (e) {
-      throw e;
+      rethrow;
     }
     return cloudinaryResponse;
   }

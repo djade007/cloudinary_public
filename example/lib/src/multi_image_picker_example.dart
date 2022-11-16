@@ -39,13 +39,13 @@ class _MultiImagePickerExampleState extends State<MultiImagePickerExample> {
         maxImages: 300,
         enableCamera: true,
         selectedAssets: images,
-        cupertinoOptions: CupertinoOptions(takePhotoIcon: "chat"),
+        cupertinoOptions: CupertinoOptions(takePhotoIcon: 'chat'),
         materialOptions: MaterialOptions(
-          actionBarColor: "#abcdef",
-          actionBarTitle: "Example App",
-          allViewTitle: "All Photos",
+          actionBarColor: '#abcdef',
+          actionBarTitle: 'Example App',
+          allViewTitle: 'All Photos',
           useDetailsView: false,
-          selectCircleStrokeColor: "#000000",
+          selectCircleStrokeColor: '#000000',
         ),
       );
     } on Exception catch (e) {
@@ -74,7 +74,7 @@ class _MultiImagePickerExampleState extends State<MultiImagePickerExample> {
           children: <Widget>[
             Center(child: Text('Error: $_error')),
             ElevatedButton(
-              child: Text("Pick images"),
+              child: Text('Pick images'),
               onPressed: loadAssets,
             ),
             Expanded(
@@ -104,7 +104,7 @@ class _MultiImagePickerExampleState extends State<MultiImagePickerExample> {
           .map(
             (image) => CloudinaryFile.fromFutureByteData(
               image.getByteData(),
-              identifier: image.identifier ?? "test",
+              identifier: image.identifier ?? 'test',
             ),
           )
           .toList(),
@@ -114,6 +114,6 @@ class _MultiImagePickerExampleState extends State<MultiImagePickerExample> {
       _uploading = false;
     });
 
-    print(uploadedImages[0].secureUrl);
+    debugPrint(uploadedImages[0].secureUrl);
   }
 }

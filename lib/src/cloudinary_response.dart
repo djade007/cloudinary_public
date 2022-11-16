@@ -26,9 +26,9 @@ class CloudinaryResponse {
     required this.secureUrl,
     required this.originalFilename,
     required this.data,
-    this.tags: const [],
-    this.context: const {},
-    this.fromCache: false,
+    this.tags = const [],
+    this.context = const {},
+    this.fromCache = false,
   });
 
   /// Instantiate this class from a map data

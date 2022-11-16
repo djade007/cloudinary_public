@@ -26,7 +26,7 @@ class _ImagePickerExampleState extends State<ImagePickerExample> {
       if (image != null) {
         _pickedFile = image;
       } else {
-        print('No image selected.');
+        debugPrint('No image selected.');
       }
     });
   }
@@ -64,7 +64,7 @@ class _ImagePickerExampleState extends State<ImagePickerExample> {
   }
 
   Future<void> _upload() async {
-    if(_pickedFile == null) return;
+    if (_pickedFile == null) return;
 
     setState(() {
       _uploading = true;
@@ -86,10 +86,10 @@ class _ImagePickerExampleState extends State<ImagePickerExample> {
           });
         },
       );
-      print(res);
+      debugPrint(res.toString());
     } on CloudinaryException catch (e) {
-      print(e.message);
-      print(e.request);
+      debugPrint(e.message);
+      debugPrint(e.request.toString());
     }
 
     setState(() {

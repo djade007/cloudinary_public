@@ -1,9 +1,9 @@
 import 'dart:io';
 
 import 'package:cloudinary_public/cloudinary_public.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter/foundation.dart';
 
-main() async {
+void main() async {
   // set cache as true if you don't want to make an upload call with files of the same filename
   // in such case if the filepath/identifier has already been uploaded before, you simply get the previously cached response.
   var cloudinary =
@@ -13,14 +13,16 @@ main() async {
   File file = File('');
   try {
     CloudinaryResponse response = await cloudinary.uploadFile(
-      CloudinaryFile.fromFile(file.path,
-          resourceType: CloudinaryResourceType.Image),
+      CloudinaryFile.fromFile(
+        file.path,
+        resourceType: CloudinaryResourceType.Image,
+      ),
     );
 
-    print(response.secureUrl);
+    debugPrint(response.secureUrl);
   } on CloudinaryException catch (e) {
-    print(e.message);
-    print(e.request);
+    debugPrint(e.message);
+    debugPrint(e.request.toString());
   }
 
   // Using Byte Data. For example gotten from: https://pub.dev/packages/multi_image_picker
@@ -38,7 +40,7 @@ main() async {
         .toList(),
   );
 
-  print(uploadedImages[0].secureUrl);
+  debugPrint(uploadedImages[0].secureUrl);
 }
 
 class Asset {
