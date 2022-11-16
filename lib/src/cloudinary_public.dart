@@ -18,7 +18,11 @@ class CloudinaryPublic {
   /// To cache all the uploaded files in the current class instance
   final Map<String?, CloudinaryResponse> _uploadedFiles = {};
 
-  static Dio _dio = Dio();
+  /// The provided Dio client to be used to upload files
+  final Dio? dioClient;
+
+  /// The Dio client to be used to upload files
+  final Dio _dioClient;
 
   /// Cloud name from Cloudinary
   final String _cloudName;
@@ -33,17 +37,8 @@ class CloudinaryPublic {
     this._cloudName,
     this._uploadPreset, {
     this.cache = false,
-  }) {
-    _dio = Dio(
-      BaseOptions(
-        baseUrl: _baseUrl,
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'multipart/form-data'
-        },
-      ),
-    );
-  }
+    this.dioClient,
+  }) : _dioClient = dioClient ?? Dio();
 
   String _createUrl(CloudinaryResourceType type) {
     var url = '$_baseUrl/$_cloudName/'
@@ -87,10 +82,10 @@ class CloudinaryPublic {
     if (file.fromExternalUrl) {
       data[_fieldName] = file.url!;
     } else {
-      data[_fieldName] = await file.toMultipartFile(_fieldName);
+      data[_fieldName] = await file.toMultipartFile();
     }
 
-    var response = await _dio.post(
+    var response = await _dioClient.post(
       _createUrl(file.resourceType),
       data: FormData.fromMap(data),
       onSendProgress: onProgress,
@@ -187,8 +182,10 @@ class CloudinaryPublic {
 
     List<MultipartFile>? chunks = file.createChunks(chunksCount, maxChunkSize);
 
-    Map<String, dynamic> data =
-        file.toFormData(uploadPreset: uploadPreset ?? _uploadPreset);
+    Map<String, dynamic> data = file.toFormData(
+      uploadPreset: uploadPreset ?? _uploadPreset,
+    );
+
     try {
       for (int i = 0; i < chunksCount; i++) {
         final start = i * maxChunkSize;
@@ -199,7 +196,7 @@ class CloudinaryPublic {
           ...data,
         });
 
-        finalResponse = await _dio.post(
+        finalResponse = await _dioClient.post(
           _createUrl(file.resourceType),
           data: formData,
           options: Options(

@@ -5,45 +5,24 @@ import 'dart:typed_data';
 import 'package:cloudinary_public/cloudinary_public.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'file_manager.dart';
+
 const chunkSize10 = 1024 * 1024 * 10; // 10MB
 
-File getFile() {
-  File file = File('../test/icon.png');
-  try {
-    file.lengthSync();
-  } catch (exception) {
-    file = File('test/icon.png');
-  }
-  return file;
-}
-
-Future<ByteData> getFutureByteData() async {
-  final tempFile = getFile();
-  Uint8List uIntBytes = tempFile.readAsBytesSync();
-  ByteData bytes = (ByteData.view(uIntBytes.buffer));
-  return Future.value(bytes);
-}
-
-// To test video add sample video to test folder
-File getVideoFile() {
-  File file = File('../test/video.mp4');
-  try {
-    file.lengthSync();
-  } catch (exception) {
-    file = File('test/video.mp4');
-  }
-  return file;
-}
-
-Future<ByteData> getFutureVideoByteData() {
-  final tempFile = getVideoFile();
-  Uint8List uIntBytes = tempFile.readAsBytesSync();
-  ByteData bytes = (ByteData.view(uIntBytes.buffer));
-  return Future.value(bytes);
-}
-
 void main() {
-  final tempFile = getFile();
+  late File tempFile;
+  late File tempVideoFile;
+
+  setUpAll(() {
+    tempFile = getFile();
+    tempVideoFile = getVideoFile();
+  });
+
+  tearDownAll(() {
+    // delete generated video file
+    deleteGeneratedVideoFile();
+  });
+
   group('Cloudinary file size test', () {
     test('uploads an image file', () async {
       final file = CloudinaryFile.fromFile(tempFile.path);
@@ -69,7 +48,7 @@ void main() {
   group('cloudinary chunks test', () {
     test('chunks count and size', () async {
       // Getting file
-      File file = getVideoFile();
+      final file = tempVideoFile;
       CloudinaryFile videoFile = CloudinaryFile.fromFile(file.path);
       ByteData byteData = await getFutureVideoByteData();
       CloudinaryFile videoFileFromByteData = CloudinaryFile.fromByteData(

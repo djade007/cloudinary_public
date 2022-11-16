@@ -15,7 +15,8 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   matcher: any
-  flutter_lints: ^2.0.1
+  flutter_lints: any
+  mocktail: any
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

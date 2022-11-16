@@ -174,7 +174,7 @@ class CloudinaryFile {
   }
 
   /// Convert [CloudinaryFile] to [MultipartFile]
-  Future<MultipartFile> toMultipartFile([String fieldName = 'file']) async {
+  Future<MultipartFile> toMultipartFile() async {
     assert(
       !fromExternalUrl,
       'toMultipartFile() not available when uploading from external urls',
