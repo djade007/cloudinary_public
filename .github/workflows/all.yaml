@@ -21,6 +21,8 @@ jobs:
           channel: 'stable'
       - name: Install dependencies
         run: flutter pub get
+      - name: Copy env file
+        run: cp example/lib/src/.init.example.dart example/lib/src/.init.dart
       - name: Analyze
         run: flutter analyze
       - name: Tests
