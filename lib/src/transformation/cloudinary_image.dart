@@ -14,11 +14,11 @@ class CloudinaryImage {
 
   CloudinaryImage(String url) {
     // remove version
-    _originalUrl = url.replaceFirst(RegExp(r"v\d+/"), '');
+    _originalUrl = url.replaceFirst(RegExp(r'v\d+/'), '');
 
     final resource = url.split('/upload/');
     assert(resource.length == 2, 'Invalid cloudinary url');
-    _path = resource[0] + '/upload/';
+    _path = '${resource[0]}/upload/';
     _publicId = resource[1];
   }
 
@@ -32,7 +32,7 @@ class CloudinaryImage {
     return Transformation(_path, _publicId);
   }
 
-  Transformation thumbnail({int width: 200, int height: 200}) {
+  Transformation thumbnail({int width = 200, int height = 200}) {
     return transform()
         .width(width)
         .height(height)

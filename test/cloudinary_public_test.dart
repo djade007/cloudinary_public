@@ -20,14 +20,14 @@ void main() {
     );
 
     final res = await cloudinary.uploadFile(file);
-    expect(res, TypeMatcher<CloudinaryResponse>());
+    expect(res, const TypeMatcher<CloudinaryResponse>());
 
     // test toString
     expect(res.toString(), res.toMap().toString());
 
     // test cache
     final secondUpload = await cloudinary.uploadFile(file);
-    expect(secondUpload, TypeMatcher<CloudinaryResponse>());
+    expect(secondUpload, const TypeMatcher<CloudinaryResponse>());
     expect(secondUpload.fromCache, true);
   });
 
@@ -40,23 +40,23 @@ void main() {
       cache: true,
     );
 
-    final file = CloudinaryFile.fromFile(tempFile.path,
-        resourceType: CloudinaryResourceType.Image,
-        tags: [
-          'trip'
-        ],
-        context: {
-          'alt': 'Image',
-        });
+    final file = CloudinaryFile.fromFile(
+      tempFile.path,
+      resourceType: CloudinaryResourceType.Image,
+      tags: ['trip'],
+      context: {
+        'alt': 'Image',
+      },
+    );
     final res = await cloudinary.uploadFile(file);
-    expect(res, TypeMatcher<CloudinaryResponse>());
+    expect(res, const TypeMatcher<CloudinaryResponse>());
 
     // test toString
     expect(res.toString(), res.toMap().toString());
 
     // test cache
     final secondUpload = await cloudinary.uploadFile(file);
-    expect(secondUpload, TypeMatcher<CloudinaryResponse>());
+    expect(secondUpload, const TypeMatcher<CloudinaryResponse>());
     expect(secondUpload.fromCache, true);
   });
 
@@ -67,10 +67,13 @@ void main() {
       cache: true,
     );
 
-    final file = CloudinaryFile.fromFile(tempFile.path,
-        resourceType: CloudinaryResourceType.Image, tags: ['trip']);
+    final file = CloudinaryFile.fromFile(
+      tempFile.path,
+      resourceType: CloudinaryResourceType.Image,
+      tags: ['trip'],
+    );
     final res = await cloudinary.uploadFile(file);
-    expect(res, TypeMatcher<CloudinaryResponse>());
+    expect(res, const TypeMatcher<CloudinaryResponse>());
 
     // test toString
     expect(res.toString(), res.toMap().toString());
@@ -80,7 +83,7 @@ void main() {
       file,
       uploadPreset: 'another_preset',
     );
-    expect(secondUpload, TypeMatcher<CloudinaryResponse>());
+    expect(secondUpload, const TypeMatcher<CloudinaryResponse>());
     expect(secondUpload.fromCache, true);
   });
 
@@ -102,9 +105,9 @@ void main() {
 
     expect(uploadedFiles.length, 2);
 
-    expect(uploadedFiles[0], TypeMatcher<CloudinaryResponse>());
+    expect(uploadedFiles[0], const TypeMatcher<CloudinaryResponse>());
 
-    expect(uploadedFiles[1], TypeMatcher<CloudinaryResponse>());
+    expect(uploadedFiles[1], const TypeMatcher<CloudinaryResponse>());
   });
 
   test('upload multiple image byteData', () async {
@@ -128,9 +131,9 @@ void main() {
 
     expect(uploadedFiles.length, 2);
 
-    expect(uploadedFiles[0], TypeMatcher<CloudinaryResponse>());
+    expect(uploadedFiles[0], const TypeMatcher<CloudinaryResponse>());
 
-    expect(uploadedFiles[1], TypeMatcher<CloudinaryResponse>());
+    expect(uploadedFiles[1], const TypeMatcher<CloudinaryResponse>());
   });
 
   test('Test transformation', () {
@@ -167,16 +170,17 @@ void main() {
         .generate();
 
     expect(
-        'https://res.cloudinary.com/demo/image/upload/c_thumb,g_face,h_150,'
-        'w_150/r_20/e_sepia/e_brightness:200,g_south_east,l_cloudinary_icon,'
-        'o_60,w_50,x_5,y_5/a_10/front_face.png',
-        url);
+      'https://res.cloudinary.com/demo/image/upload/c_thumb,g_face,h_150,'
+      'w_150/r_20/e_sepia/e_brightness:200,g_south_east,l_cloudinary_icon,'
+      'o_60,w_50,x_5,y_5/a_10/front_face.png',
+      url,
+    );
   });
 
   test('thumbnail shortcut', () {
     final cloudinary = CloudinaryPublic(
-      "demo",
-      "present",
+      'demo',
+      'present',
       cache: true,
     );
 
@@ -187,7 +191,7 @@ void main() {
         'h_200,w_200/cloudinary_icon');
   });
 
-  test("Upload file in Chunks", () async {
+  test('Upload file in Chunks', () async {
     final cloudinary = CloudinaryPublic(
       cloudName,
       uploadPreset,
@@ -201,10 +205,10 @@ void main() {
       tags: ['trip'],
     );
     final res = await cloudinary.uploadFileInChunks(file);
-    expect(res, TypeMatcher<CloudinaryResponse>());
+    expect(res, const TypeMatcher<CloudinaryResponse>());
   });
 
-  test("Upload file bytes in chunks", () async {
+  test('Upload file bytes in chunks', () async {
     final cloudinary = CloudinaryPublic(
       cloudName,
       uploadPreset,
@@ -218,6 +222,6 @@ void main() {
       identifier: 'video.mp4',
     );
     final res = await cloudinary.uploadFileInChunks(file);
-    expect(res, TypeMatcher<CloudinaryResponse>());
+    expect(res, const TypeMatcher<CloudinaryResponse>());
   });
 }

@@ -5,7 +5,7 @@ import 'dart:typed_data';
 import 'package:cloudinary_public/cloudinary_public.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-const chunkSize = 1024 * 1024 * 10; // 10MB
+const chunkSize10 = 1024 * 1024 * 10; // 10MB
 
 File getFile() {
   File file = File('../test/icon.png');
@@ -44,7 +44,7 @@ Future<ByteData> getFutureVideoByteData() {
 
 void main() {
   final tempFile = getFile();
-  group("Cloudinary file size test", () {
+  group('Cloudinary file size test', () {
     test('uploads an image file', () async {
       final file = CloudinaryFile.fromFile(tempFile.path);
       expect(file.fileSize, tempFile.lengthSync());
@@ -52,7 +52,7 @@ void main() {
 
     test('uploads an image from byte data', () async {
       final bytes = await getFutureByteData();
-      final file = CloudinaryFile.fromByteData(bytes, identifier: "test");
+      final file = CloudinaryFile.fromByteData(bytes, identifier: 'test');
       expect(file.fileSize, tempFile.lengthSync());
     });
 
@@ -60,55 +60,57 @@ void main() {
       final bytes = await getFutureByteData();
       final file = CloudinaryFile.fromBytesData(
         bytes.buffer.asUint8List(),
-        identifier: "test",
+        identifier: 'test',
       );
       expect(file.fileSize, tempFile.lengthSync());
     });
   });
 
-  group("cloudinary chunks test", () {
-    test("chunks count and size", () async {
+  group('cloudinary chunks test', () {
+    test('chunks count and size', () async {
       // Getting file
       File file = getVideoFile();
       CloudinaryFile videoFile = CloudinaryFile.fromFile(file.path);
       ByteData byteData = await getFutureVideoByteData();
       CloudinaryFile videoFileFromByteData = CloudinaryFile.fromByteData(
         byteData,
-        identifier: "video.mp4",
+        identifier: 'video.mp4',
       );
 
       // Values from file
-      int _maxChunkSize = min(videoFile.fileSize, chunkSize);
-      int _chunksCount = (videoFile.fileSize / _maxChunkSize).ceil();
+      int maxChunkSize = min(videoFile.fileSize, chunkSize10);
+      int chunksCount = (videoFile.fileSize / maxChunkSize).ceil();
 
-      var chunks = videoFile.createChunks(_chunksCount, _maxChunkSize);
+      var chunks = videoFile.createChunks(chunksCount, maxChunkSize);
 
       // count chunk size
-      int _chunkSize = 0;
-      chunks.forEach((element) {
-        _chunkSize += element.length;
-      });
+      int chunkSize = 0;
+      for (var element in chunks) {
+        chunkSize += element.length;
+      }
 
       // values from byte data
-      int _maxChunkSizeFromByteData =
-          min(videoFileFromByteData.fileSize, chunkSize);
-      int _chunksCountFromByteData =
-          (videoFileFromByteData.fileSize / _maxChunkSizeFromByteData).ceil();
+      int maxChunkSizeFromByteData =
+          min(videoFileFromByteData.fileSize, chunkSize10);
+      int chunksCountFromByteData =
+          (videoFileFromByteData.fileSize / maxChunkSizeFromByteData).ceil();
 
       var chunksFromByteData = videoFileFromByteData.createChunks(
-          _chunksCountFromByteData, _maxChunkSize);
+        chunksCountFromByteData,
+        maxChunkSize,
+      );
 
-      int _chunkSizeFromByteData = 0;
-      chunksFromByteData.forEach((element) {
-        _chunkSizeFromByteData += element.length;
-      });
+      int chunkSizeFromByteData = 0;
+      for (var element in chunksFromByteData) {
+        chunkSizeFromByteData += element.length;
+      }
 
       // Tests
-      expect(_chunkSize, videoFile.fileSize);
-      expect(chunks.length, _chunksCount);
+      expect(chunkSize, videoFile.fileSize);
+      expect(chunks.length, chunksCount);
       expect(chunks.length, chunksFromByteData.length);
-      expect(_chunkSize, _chunkSizeFromByteData);
-      expect(_chunkSizeFromByteData, videoFile.fileSize);
+      expect(chunkSize, chunkSizeFromByteData);
+      expect(chunkSizeFromByteData, videoFile.fileSize);
     });
   });
 }

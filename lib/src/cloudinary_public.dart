@@ -16,7 +16,7 @@ class CloudinaryPublic {
   static const _fieldName = 'file';
 
   /// To cache all the uploaded files in the current class instance
-  Map<String?, CloudinaryResponse> _uploadedFiles = {};
+  final Map<String?, CloudinaryResponse> _uploadedFiles = {};
 
   static Dio _dio = Dio();
 
@@ -76,8 +76,9 @@ class CloudinaryPublic {
     ProgressCallback? onProgress,
   }) async {
     if (cache) {
-      if (_uploadedFiles.containsKey(file.identifier))
+      if (_uploadedFiles.containsKey(file.identifier)) {
         return _uploadedFiles[file.identifier]!.enableCache();
+      }
     }
 
     Map<String, dynamic> data =
@@ -180,22 +181,21 @@ class CloudinaryPublic {
 
     Response? finalResponse;
 
-    int _maxChunkSize = min(file.fileSize, chunkSize);
+    int maxChunkSize = min(file.fileSize, chunkSize);
 
-    int _chunksCount = (file.fileSize / _maxChunkSize).ceil();
+    int chunksCount = (file.fileSize / maxChunkSize).ceil();
 
-    List<MultipartFile>? _chunks =
-        file.createChunks(_chunksCount, _maxChunkSize);
+    List<MultipartFile>? chunks = file.createChunks(chunksCount, maxChunkSize);
 
     Map<String, dynamic> data =
         file.toFormData(uploadPreset: uploadPreset ?? _uploadPreset);
     try {
-      for (int i = 0; i < _chunksCount; i++) {
-        final start = i * _maxChunkSize;
-        final end = min((i + 1) * _maxChunkSize, file.fileSize);
+      for (int i = 0; i < chunksCount; i++) {
+        final start = i * maxChunkSize;
+        final end = min((i + 1) * maxChunkSize, file.fileSize);
 
         final formData = FormData.fromMap({
-          "file": _chunks[i],
+          'file': chunks[i],
           ...data,
         });
 
@@ -206,13 +206,13 @@ class CloudinaryPublic {
             headers: {
               'Accept': 'application/json',
               'Content-Type': 'multipart/form-data',
-              "X-Unique-Upload-Id": file.identifier,
+              'X-Unique-Upload-Id': file.identifier,
               'Content-Range': 'bytes $start-${end - 1}/${file.fileSize}',
             },
           ),
           onSendProgress: (sent, total) {
             // total progress
-            final s = sent + i * _maxChunkSize;
+            final s = sent + i * maxChunkSize;
             onProgress?.call(s, file.fileSize);
           },
         );
@@ -235,7 +235,7 @@ class CloudinaryPublic {
         finalResponse.data,
       );
     } catch (e) {
-      throw e;
+      rethrow;
     }
     return cloudinaryResponse;
   }

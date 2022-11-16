@@ -3,8 +3,8 @@ import '../../cloudinary_public.dart';
 class Transformation {
   final String _path;
   final String _publicId;
-  Map<String, String> _params = {};
-  List<Map<String, String>> _chains = [];
+  final Map<String, String> _params = {};
+  final List<Map<String, String>> _chains = [];
 
   Transformation(this._path, this._publicId);
 
@@ -67,10 +67,10 @@ class Transformation {
 
     String url = _path;
 
-    _chains.forEach((element) {
+    for (var element in _chains) {
       url += _values(element);
       url += '/';
-    });
+    }
 
     url += _publicId;
 
@@ -90,9 +90,9 @@ class Transformation {
 
     List<String> values = [];
 
-    keys.forEach((key) {
+    for (var key in keys) {
       values.add('${key}_${items[key]}');
-    });
+    }
 
     return values.join(',');
   }
