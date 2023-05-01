@@ -1,3 +1,6 @@
+## 0.21.0
+- Upgrade dio dependency
+
 ## 0.20.0
 - Upload large files in chunks support
 - Switch from http package to Dio to support chunk upload
