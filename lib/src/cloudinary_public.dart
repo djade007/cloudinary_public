@@ -5,7 +5,6 @@ import 'dart:typed_data';
 
 import 'package:cloudinary_public/cloudinary_public.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
 
 /// The base class for this package
 class CloudinaryPublic {
@@ -42,7 +41,7 @@ class CloudinaryPublic {
 
   String _createUrl(CloudinaryResourceType type) {
     var url = '$_baseUrl/$_cloudName/'
-        '${describeEnum(type).toLowerCase()}'
+        '${type.name.toLowerCase()}'
         '/upload';
     return url;
   }

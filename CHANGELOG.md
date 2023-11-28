@@ -1,5 +1,5 @@
-## 0.23.0
-- Upgrade dio dependency
+## 0.23.1
+- Update dio dependency and sdk constraints
 
 ## 0.20.0
 - Upload large files in chunks support
