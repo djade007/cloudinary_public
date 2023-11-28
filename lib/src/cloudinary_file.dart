@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:math';
+
 // ignore: unnecessary_import
 import 'dart:typed_data';
 
@@ -234,8 +235,8 @@ class CloudinaryFile {
       chunkStream = File(filePath!).openRead(start, end);
     }
 
-    return MultipartFile(
-      chunkStream,
+    return MultipartFile.fromStream(
+      () => chunkStream,
       end - start,
       filename: identifier,
     );

@@ -294,5 +294,5 @@ const _sampleResponse = {
       'http://res.cloudinary.com/$cloudName/image/upload/v1590212116/psryios0nkgpf1h4um3h.jpg',
   'secure_url':
       'https://res.cloudinary.com/$cloudName/image/upload/v1590212116/psryios0nkgpf1h4um3h.jpg',
-  'original_filename': '001'
+  'original_filename': '001',
 };
